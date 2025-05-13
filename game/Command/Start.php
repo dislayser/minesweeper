@@ -45,6 +45,13 @@ class Start extends Command
                 InputOption::VALUE_REQUIRED,
                 'Сид для генерации',
                 null
+            )
+            ->addOption(
+                'difficult',
+                'd',
+                InputOption::VALUE_REQUIRED,
+                'Сложность [easy, medium, hard]',
+                "easy"
             );
     }
 
@@ -53,21 +60,30 @@ class Start extends Command
         $x = (int) $input->getOption('rows');
         $y = (int) $input->getOption('cols');
         $seed = (int) $input->getOption('seed');
-
+        $difficultName = (string) $input->getOption('difficult');
+        dump([$x,$y,$seed, $difficultName]);
         $game = new Game(
             new Player(),
             new Field($x,$y, $seed)
         );
-        
-        $game->setDifficult(Difficult::hard());
-        
+
+        if (in_array($difficultName, ["easy", "medium", "hard"])){
+            if (method_exists(Difficult::class, $difficultName)){
+                $difficult = Difficult::$difficultName();
+            }else{
+                $difficult = Difficult::easy();
+            }
+        }
+        $game->setDifficult($difficult);
         $game->buildField();
 
         // Вывод
+        // dd($game->field()->getX());
         for ($y = 0; $y < $game->field()->getY(); $y++) {
             for ($x = 0; $x < $game->field()->getX(); $x++) {
                 /** @var Bomb|Number $cell */
                 $cell = $game->field()->getCell($x,$y);
+                // dump($cell);
                 echo $cell->isBomb() ? " x " : " " . ($cell->getBombNear() === 0 ? " " : $cell->getBombNear()) . " ";
             }
             echo PHP_EOL;

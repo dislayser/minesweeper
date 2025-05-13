@@ -72,7 +72,7 @@ class Field
         $positions = [];
         for ($r = 0; $r < $this->getY(); $r++) {
             for ($c = 0; $c < $this->getX(); $c++) {
-                $positions[] = [$r, $c];
+                $positions[] = [$c, $r];
             }
         }
         // Перемешиваем позиции
@@ -81,6 +81,7 @@ class Field
         // Установка бомб
         for ($i = 0; $i < $bombs; $i++){
             [$x, $y] = $positions[$i];
+            dump("бомба {$x} {$y}");
             $this->setCell(new Bomb($x, $y));
         }
         
