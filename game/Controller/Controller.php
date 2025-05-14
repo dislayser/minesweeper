@@ -11,6 +11,9 @@ class Controller implements ControllerInterface
     {
         $data = [];
         $data["content"] = $content;
+        $data["user"] = [
+            "theme" => "dark"
+        ];
 
         $loader = new FilesystemLoader(__DIR__."/../../templates");
         $twig = new Environment($loader, [
