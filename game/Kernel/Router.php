@@ -11,12 +11,16 @@ class Router
 
     public function addRoute(Route $route) : void
     {
-        $routes[] = $route;
+        $this->routes[] = $route;
     }
 
     public function start(string $url, string $method): void
     {
-
+        foreach ($this->routes as $route) {
+            if ($route->url == $url){
+                $route->run();
+            }
+        }
     }
 
     public function error(int $code) : void

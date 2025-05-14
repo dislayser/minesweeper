@@ -18,7 +18,7 @@ class Controller implements ControllerInterface
             'cache' => __DIR__."/../../cache/twig",
         ]);
         $render = $twig->render($name, $data);
-        echo $render; 
+        echo $render;
     }
     public function json(array|string $data = []) : void
     {
