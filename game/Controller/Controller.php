@@ -20,6 +20,7 @@ class Controller implements ControllerInterface
             'debug' => true,
             'cache' => __DIR__."/../../cache/twig",
         ]);
+        dump($data);
         $render = $twig->render($name, $data);
         echo $render;
     }

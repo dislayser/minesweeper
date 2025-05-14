@@ -102,6 +102,11 @@ class Field
             $this->setCell(new Bomb($x, $y));
         }
         
-        mt_srand(null);
+        mt_srand(0);
+    }
+
+    public function getCells() : array
+    {
+        return $this->cells;
     }
 }

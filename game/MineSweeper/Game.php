@@ -27,7 +27,7 @@ class Game
     public function buildField(): void
     {
         // Постройка бомб
-        $this->field->setBombs($this->field->getX() * $this->field->getY() / $this->difficult->getBombRatio());
+        $this->field->setBombs((int)($this->field->getX() * $this->field->getY() / $this->difficult->getBombRatio()));
 
         // Постройка числовых ячеек
         for ($y = 0; $y < $this->field->getY(); $y++) {
