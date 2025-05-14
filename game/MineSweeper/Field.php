@@ -3,11 +3,11 @@
 namespace Game\MineSweeper;
 
 use Game\MineSweeper\CellType\Bomb;
+use Game\MineSweeper\CellType\Number;
 
 /**
  * -1   :: Bomb
- * 0    :: Empty cell
- * 1-8  :: Number cell
+ * 0-8  :: Number cell
  */
 class Field
 {
@@ -15,9 +15,7 @@ class Field
     public const MAX_Y = 200;
     public const MIN_X = 1;
     public const MIN_Y = 1;
-    /**
-     * @var array[Cell[]]
-     */
+    /** @var array[Cell[]] $cells */
     private array $cells = [];
     private int $seed;
     private int $bombs;
@@ -29,9 +27,7 @@ class Field
     ) {
         $this->x = min(max($this->x, self::MIN_X), self::MAX_X);
         $this->y = min(max($this->y, self::MIN_Y), self::MAX_Y);
-        if (!$seed){
-            $seed = rand(1, 100000);
-        }
+        if (!$seed) $seed = rand(1, 100000);
         $this->seed = $seed;
     }
 
@@ -66,7 +62,7 @@ class Field
         }
     }
 
-    /** @return Cell[] */
+    /** @return (Cell|null)[] */
     public function getCellsNear(int $x, int $y): ?array
     {
         return [
@@ -108,5 +104,18 @@ class Field
     public function getCells() : array
     {
         return $this->cells;
+    }
+
+    /** @return array[Cell[]] */
+    public function openField(int $x, int $y) : array
+    {
+        $cells = []; 
+        /** @var Bomb|Number|null $open */
+        $open = $this->getCell($x,$y);
+        $cells[$y][$x] = $open;
+        if ($open?->isBomb() || $open?->getBombNear() > 0){
+            return $cells;
+        }
+        return $cells;
     }
 }

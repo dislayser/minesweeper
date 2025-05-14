@@ -12,7 +12,14 @@
     <link href="/assets/css/custom.css" rel="stylesheet">
 </head>
 <body data-bs-theme="{{ user.theme }}">
-    <div class="container-fluid my-5">
+    <main>
+        <div class="container my-3">
+            <h5>Сапер</h5>
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-outline-secondary">Опции</button>
+            </div>
+        </div>
+        <div class="container-fluid my-5">
             <div class="d-flex flex-column">
             {% set field = content.field %}
             {% for col in 0..(field.getY - 1) %}
@@ -20,7 +27,7 @@
                 {% for row in 0..(field.getX - 1) %}
                     {% set cell = field.getCell(row, col) %}
                     <div
-                        class="ms-cell border text-center"
+                        class="ms-cell border text-center font-monospace"
                         data-row="{{ row }}"
                         data-col="{{ col }}"
                     >
@@ -37,7 +44,9 @@
                 </div>
             {% endfor %}
             </div>
-    </div>
+        </div>
+    </main>
+
     {% include("js.html.twig") %}
 </body>
 </html>
