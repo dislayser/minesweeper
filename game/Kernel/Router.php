@@ -17,7 +17,7 @@ class Router
     public function start(string $url, string $method): void
     {
         foreach ($this->routes as $route) {
-            if ($route->url == $url){
+            if ($route->url == $url && in_array($method, $route->methods)){
                 $route->run();
             }
         }
