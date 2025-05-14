@@ -9,6 +9,11 @@ class Server
     private array $players;
     public function __construct(public string $serverId) {}
 
+    public function start(): void
+    {
+        
+    }
+
     public function getServerId() : string
     {
         return $this->serverId;

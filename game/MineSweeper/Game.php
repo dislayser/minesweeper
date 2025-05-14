@@ -37,16 +37,8 @@ class Game
                 
                 $cell = new Number($x, $y);
                 
-                $cellsNear = [
-                    $this->field->getCell($x-1, $y-1),
-                    $this->field->getCell($x, $y-1),    
-                    $this->field->getCell($x+1, $y-1),
-                    $this->field->getCell($x-1, $y),
-                    $this->field->getCell($x+1, $y),
-                    $this->field->getCell($x-1, $y+1),
-                    $this->field->getCell($x, $y+1),    
-                    $this->field->getCell($x+1, $y+1)
-                ];
+                $cellsNear = $this->field()->getCellsNear($x, $y);
+                
                 $bombs = 0;
                 foreach ($cellsNear as $key => $value) {
                     if ($value?->isBomb()) $bombs++;

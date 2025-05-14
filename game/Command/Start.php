@@ -78,12 +78,10 @@ class Start extends Command
         $game->buildField();
 
         // Вывод
-        // dd($game->field()->getX());
         for ($y = 0; $y < $game->field()->getY(); $y++) {
             for ($x = 0; $x < $game->field()->getX(); $x++) {
                 /** @var Bomb|Number $cell */
                 $cell = $game->field()->getCell($x,$y);
-                // dump($cell);
                 echo $cell->isBomb() ? " x " : " " . ($cell->getBombNear() === 0 ? " " : $cell->getBombNear()) . " ";
             }
             echo PHP_EOL;

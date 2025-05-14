@@ -20,6 +20,7 @@ class Field
      */
     private array $cells = [];
     private int $seed;
+    private int $bombs;
 
     public function __construct(
         private int $x,
@@ -65,8 +66,25 @@ class Field
         }
     }
 
+    /** @return Cell[] */
+    public function getCellsNear(int $x, int $y): ?array
+    {
+        return [
+            $this->getCell($x-1, $y-1),
+            $this->getCell($x,   $y-1),
+            $this->getCell($x+1, $y-1),
+            $this->getCell($x-1, $y),
+            // $this->getCell($x, $y),
+            $this->getCell($x+1, $y),
+            $this->getCell($x-1, $y+1),
+            $this->getCell($x,   $y+1),
+            $this->getCell($x+1, $y+1),
+        ];
+    }
+
     public function setBombs(int $bombs): void
     {
+        $this->bombs = min($bombs, $this->getX() * $this->getY());
         mt_srand($this->seed);
         // Список всех возможных позиций
         $positions = [];
@@ -79,9 +97,8 @@ class Field
         shuffle($positions);
 
         // Установка бомб
-        for ($i = 0; $i < $bombs; $i++){
+        for ($i = 0; $i < $this->bombs; $i++){
             [$x, $y] = $positions[$i];
-            dump("бомба {$x} {$y}");
             $this->setCell(new Bomb($x, $y));
         }
         
