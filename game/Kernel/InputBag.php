@@ -67,6 +67,16 @@ class InputBag
         return new self($_SESSION);
     }
 
+    public function server() : self
+    {
+        return new self($_SERVER);
+    }
+
+    public function cookie() : self
+    {
+        return new self($_COOKIE);
+    }
+
     protected function parseKeys(array|string $keys) : array
     {
         if (is_string($keys)) $keys = explode(".", $keys);
