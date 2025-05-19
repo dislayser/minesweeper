@@ -2,6 +2,7 @@
 
 namespace Game\Controller;
 
+use Game\Service\Util\JsonUtil;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -26,7 +27,13 @@ class Controller implements ControllerInterface
     }
     public function json(array|string $data = []) : void
     {
-
+        if (is_array($data)){
+            echo JsonUtil::parse($data);
+        }
+        if (is_string($data) && JsonUtil::isJson($data)){
+            echo $data;
+        }
+        return;
     }
     public function image() : void
     {

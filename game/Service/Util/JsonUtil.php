@@ -12,4 +12,11 @@ class JsonUtil
     {
         return json_decode($data, true);
     }
+
+    // Для проверки является ли строка JSON
+    public static function isJson(mixed $str): bool
+    {
+        json_decode($str);
+        return json_last_error() === JSON_ERROR_NONE;
+    }
 }

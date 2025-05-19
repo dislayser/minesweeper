@@ -1,0 +1,43 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+<div class="container my-3">
+    <h5>Сапер</h5>
+    <div class="d-flex gap-3">
+        <button type="button" class="btn btn-outline-secondary">Опции</button>
+    </div>
+</div>
+<div class="container-fluid my-5">
+    <div class="d-flex flex-column" id="gameField">
+    {% set field = content.field %}
+    {% for row in 0..(field.getY - 1) %}
+        <div class="d-flex justify-content-center" data-row="{{ row }}">
+        {% for col in 0..(field.getX - 1) %}
+            {% set cell = field.getCell(col, row) %}
+            <div
+                class="ms-cell text-center font-monospace"
+                data-col="{{ col }}"
+            >
+            {% if cell.isBomb %}
+                <span class="text-danger"><i class="bi bi-flag"></i></span>
+            {% else %}
+                {% set bombNear = cell.getBombNear %}
+                {% if bombNear != 0 %}
+                    <span class="ms-text-{{ bombNear }}">{{ bombNear }}</span>
+                {% endif %}
+            {% endif %}
+            </div>
+        {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block js_render %}
+<script src="/assets/js/field.js"></script>
+<script>
+    var field = new Field();
+    field.getCell(); 
+</script>
+{% endblock  %}

@@ -8,9 +8,8 @@ down:
 start:
 	docker compose up -d
 
-
 composer-install:
-	docker compose run --rm scale-php-cli composer install
+	docker compose run --rm game-php composer install
 
 docker-up:
 	docker compose up -d
@@ -25,4 +24,4 @@ docker-down-clear:
 	docker compose down -v --remove-orphans
 	
 composer-update:
-	docker compose run --rm scale-php-cli composer update
+	docker compose run --rm game-php composer update

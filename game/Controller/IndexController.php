@@ -13,12 +13,12 @@ class IndexController extends Controller
     {
         $game = new Game(
             new Player(),
-            new Field(20,20)
+            new Field(10,10)
         );
         $game->setDifficult(Difficult::hard());
         $game->buildField();
 
-        $this->render("base.html.twig", [
+        $this->render("game/index.twig", [
             "field" => $game->field()
         ]);
     }
