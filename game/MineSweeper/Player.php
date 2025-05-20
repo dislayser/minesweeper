@@ -2,7 +2,9 @@
 
 namespace Game\MineSweeper;
 
-use Exception;
+use Game\Exeption\GameExeption;
+use Game\Exeption\PlayerDieExeption;
+
 
 class Player
 {
@@ -25,14 +27,14 @@ class Player
 
     protected function win() : bool
     {
-        if ($this->die) throw new Exception("Этот игрок проиграл.");
+        if ($this->die) throw new PlayerDieExeption("Этот игрок проиграл.");
         $this->win = true;
         return true;
     }
 
     protected function die() : bool
     {
-        if ($this->win) throw new Exception("Этот игрок выиграл.");
+        if ($this->win) throw new GameExeption("Этот игрок выиграл.");
         $this->die = true;
         return true;
     }
