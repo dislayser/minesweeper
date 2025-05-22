@@ -2,12 +2,20 @@
 
 namespace Game\Controller;
 
+use Game\Kernel\InputBag;
 use Game\Service\Util\JsonUtil;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 class Controller implements ControllerInterface
 {
+    readonly protected InputBag $bag;
+
+    public function __construct()
+    {
+        $this->bag = new InputBag(); 
+    }
+
     public function render($name = "", array $content = []) : void
     {
         $data = [];
@@ -25,6 +33,7 @@ class Controller implements ControllerInterface
         $render = $twig->render($name, $data);
         echo $render;
     }
+
     public function json(array|string $data = [], int $code = 200) : void
     {
         header('Content-Type: application/json');
@@ -37,6 +46,7 @@ class Controller implements ControllerInterface
         }
         return;
     }
+    
     public function image() : void
     {
         

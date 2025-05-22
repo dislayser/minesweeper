@@ -8,13 +8,13 @@
     </div>
 </div>
 <div class="container-fluid my-5">
-    <div class="d-flex flex-column" id="gameField">
+    <div class="d-flex flex-column user-select-none" id="gameField">
     {% set field = content.field %}
     {% for row in 0..(field.getY - 1) %}
         <div class="d-flex justify-content-center" data-row="{{ row }}">
         {% for col in 0..(field.getX - 1) %}
             {% set cell = field.getCell(col, row) %}
-            <img width="16" height="16" data-col="{{ col }}"></img>
+            <img width="16" height="16" data-col="{{ col }}" draggable="false"></img>
         {% endfor %}
         </div>
     {% endfor %}
@@ -24,8 +24,11 @@
 
 {% block js_render %}
 <script src="/assets/js/field.js"></script>
+<script src="/assets/js/game.js"></script>
 <script>
     var field = new Field();
+    var game = new Game();
+    game.events();
     field.getCell();
     const gameField = $("#gameField");
     gameField.children().each((index, row) => {

@@ -11,9 +11,10 @@ class IndexController extends Controller
 {
     public function index() : void
     {
+        
         $game = new Game(
             new Player(),
-            new Field(10,10)
+            new Field(32,16)
         );
         $game->setDifficult(Difficult::hard());
         $game->buildField();
