@@ -14,19 +14,7 @@
         <div class="d-flex justify-content-center" data-row="{{ row }}">
         {% for col in 0..(field.getX - 1) %}
             {% set cell = field.getCell(col, row) %}
-            <div
-                class="ms-cell text-center font-monospace"
-                data-col="{{ col }}"
-            >
-            {% if cell.isBomb %}
-                <span class="text-danger"><i class="bi bi-flag"></i></span>
-            {% else %}
-                {% set bombNear = cell.getBombNear %}
-                {% if bombNear != 0 %}
-                    <span class="ms-text-{{ bombNear }}">{{ bombNear }}</span>
-                {% endif %}
-            {% endif %}
-            </div>
+            <img width="16" height="16" data-col="{{ col }}"></img>
         {% endfor %}
         </div>
     {% endfor %}
@@ -38,6 +26,12 @@
 <script src="/assets/js/field.js"></script>
 <script>
     var field = new Field();
-    field.getCell(); 
+    field.getCell();
+    const gameField = $("#gameField");
+    gameField.children().each((index, row) => {
+        $(row).children().each((index, col) => {
+            $(col).attr("src", field.getCell((index > 8 ? "cell" : "cell" + index)));
+        })
+    })
 </script>
 {% endblock  %}

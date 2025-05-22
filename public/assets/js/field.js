@@ -4,11 +4,11 @@ class Field{
         this.cols;
     }
 
-    getCell(){
+    getCell(type = ""){
         var pq0 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA"
         var pq1 = "BoAAAAaCAMAAACelLz8AAAA"
         var pq2 = Array(108).join("a");
-        console.log(pq2);
+        
         var imgs = {
             w: pq0 + "AIAAAACAQMAAABIeJ9nAAAAA1BMVEX///+nxBvIAAAACklEQVQI12MAAgAABAABINItbwAAAABJRU5ErkJggg==",
             br: pq0 + "AIAAAACAgMAAAAP2OW3AAAACVBMVEW9vb3///97e3uVBMaVAAAADElEQVQI12NoYBAAAAGUAJHFJBnoAAAAAElFTkSuQmCC",
@@ -79,15 +79,20 @@ class Field{
             h1: pq0 + pq1 + "aVBMVEW9vb17e3u1AAC9u7u8qqq4Zma4X1+3SUm1FBS1Cwu8tLS8r6+2OTm3MjK2Gxu9uLi8oKC7mpq7lpa6ioq7goK4VFS4UlK3Pz+2GBi1ERG0CAi7pqa5dXW6bGy4Vla3QUG2Jye2JSW1IiJO9tWMAAAAmklEQVQoz6XS2QqDMBBA0elkNRpr3ap27/9/ZCcKbYeYB/ESEDxMwBg4pAJO3Gitt5+k8nZ8dlVEQk24ZBwn8cBvr5xRj3/dGWl649tLfQ5U8g0LvIbnMSOaGIFrYSE+9cvNG/YxyZsNksnok0ucG+r4oN400KlGQEwa0SSOt0JsEgRKi80/JTd2LE6rpJHyianB0tTOu0Er1QfBogVXL05vjgAAAABJRU5ErkJggg=="
         };
         
-        function cell(src, id) {
-            return $("<img>").attr({
-                "src" : src,
-                "id" : id,
-            });
-        }
-        for (var key in imgs){
-            let image = cell(imgs[key], key);
-            $("body").append(image);
+        // function cell(src, id) {
+        //     return $("<img>").attr({
+        //         "src" : src,
+        //         "id" : id,
+        //     });
+        // }
+        // for (var key in imgs){
+        //     let image = cell(imgs[key], key);
+        //     $("body").append(image);
+        // }
+        if (imgs[type]){
+            return imgs[type];
+        }else{
+            return null;
         }
     }
 }

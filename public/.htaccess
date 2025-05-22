@@ -1,0 +1,15 @@
+Options -Indexes
+RewriteEngine On
+
+# Страница 404
+ErrorDocument 404 /error/404.php
+ErrorDocument 403 /error/403.php
+
+# Перенаправление с HTTPS на HTTP
+RewriteCond %{HTTPS} on
+RewriteRule ^(.*)$ http://%{HTTP_HOST}/$1 [L,R=301]
+
+# Перенаправление всех остальных запросов на index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php [L]

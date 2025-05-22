@@ -25,8 +25,10 @@ class Controller implements ControllerInterface
         $render = $twig->render($name, $data);
         echo $render;
     }
-    public function json(array|string $data = []) : void
+    public function json(array|string $data = [], int $code = 200) : void
     {
+        header('Content-Type: application/json');
+        http_response_code($code);
         if (is_array($data)){
             echo JsonUtil::parse($data);
         }

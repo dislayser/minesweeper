@@ -9,9 +9,10 @@ class Router
 
     public function __construct() {}
 
-    public function addRoute(Route $route) : void
+    public function addRoute(Route $route) : static
     {
         $this->routes[] = $route;
+        return $this;
     }
 
     public function start(string $url, string $method): void
