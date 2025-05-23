@@ -4,12 +4,13 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
+use Game\Command;
 
 // Создаем экземпляр приложения
 $application = new Application();
 
 // Добавляем свои команды
-$application->add(new \Game\Command\Start());
+$application->add(new Command\Start());
 
 // Запускаем приложение
 $application->run();

@@ -1,42 +1,14 @@
-.ms-cell{
-    width: 20px;
-    height: 20px;
-    font-size: 0.8rem;
-    box-shadow: inset 0px 0px 0px 3px #787d8d;
+.cell-16{
+    width: 16px;
+    height: 16px;
 }
 
-.ms-text-8{
-    color: #fff;
+.cell-24{
+    width: 24px;
+    height: 24px;
 }
 
-.ms-text-7{
-    color: #fff;
-}
-
-.ms-text-6{
-    color: #fff;
-}
-
-.ms-text-5{
-    color: #7b0000;
-}
-
-.ms-text-4{
-    color: #00007b;
-}
-
-.ms-text-3{
-    color: #ff0101;
-}
-
-.ms-text-2{
-    color: #007b00;
-}
-
-.ms-text-1{
-    color: #0101ff;
-}
-
-.ms-text-0{
-    color: transparent;
+.cell-32{
+    width: 32px;
+    height: 32px;
 }

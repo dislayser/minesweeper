@@ -7,6 +7,7 @@ class Game{
         this.field = field;
 
         this.flags = [];
+        this.opened = [];
     }
 
     events() {

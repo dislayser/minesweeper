@@ -1,12 +1,13 @@
-server-restart:
+server-restart: stop start
+
+stop:
 	docker compose down -v --remove-orphans
+
+start:
 	docker compose up -d
 
 down:
 	docker compose down --remove-orphans
-
-start:
-	docker compose up -d
 
 composer-install:
 	docker compose run --rm game-php composer install
@@ -19,9 +20,6 @@ docker-build:
 
 docker-pull:
 	docker compose pull
-
-docker-down-clear:
-	docker compose down -v --remove-orphans
 	
 composer-update:
 	docker compose run --rm game-php composer update

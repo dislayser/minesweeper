@@ -14,7 +14,7 @@
         <div class="d-flex justify-content-center" data-row="{{ row }}">
         {% for col in 0..(field.getX - 1) %}
             {% set cell = field.getCell(col, row) %}
-            <img width="16" height="16" data-col="{{ col }}" draggable="false"></img>
+            <img class="cell-16" data-col="{{ col }}" draggable="false"></img>
         {% endfor %}
         </div>
     {% endfor %}
