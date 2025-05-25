@@ -11,6 +11,7 @@ $application = new Application();
 
 // Добавляем свои команды
 $application->add(new Command\Start());
+$application->add(new Command\StartWS());
 
 // Запускаем приложение
 $application->run();

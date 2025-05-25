@@ -6,6 +6,22 @@ class Game{
         this.seed = seed;
         this.field = field;
 
+        this.ws = new WebSocket('ws://minesweeper.local:8080');
+        this.ws.onopen = () => {
+            this.ws.send(JSON.stringify({
+                "token" : $('input[name="_csrf"]').val() ?? null
+            }));
+        };
+        this.ws.onmessage = (event) => {
+            console.log('Message from server:', event.data);
+        };
+        this.ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+        };
+        this.ws.onclose = () => {
+            console.log('Disconnected from the server');
+        };
+        
         this.flags = [];
         this.opened = [];
     }
@@ -41,16 +57,11 @@ class Game{
         row = Math.abs(parseInt(row));
         
         this.openCell(col, row)
+        this.ws.send(JSON.stringify({
+            "col" : col, 
+            "row" : row, 
+        }));
         return;
-        $.ajax({
-            url : "/api/v1/game",
-            method : "GET",
-            data : {
-                "seed" : this.seed,
-                "options" : "",
-                "_csrf" : $('input[name="_csrf"]').val() ?? null
-            }
-        })
     }
 
     

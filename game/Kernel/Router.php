@@ -22,6 +22,7 @@ class Router
                 $route->run();
             }
         }
+        http_response_code(404);
     }
 
     public function error(int $code) : void
