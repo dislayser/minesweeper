@@ -6,7 +6,7 @@ class Game{
         this.seed = seed;
         this.field = field;
 
-        this.ws = new WebSocket('ws://minesweeper.local:8080');
+        this.ws = new WebSocket('ws://localhost:8080');
         this.ws.onopen = () => {
             this.ws.send(JSON.stringify({
                 "token" : $('input[name="_csrf"]').val() ?? null
