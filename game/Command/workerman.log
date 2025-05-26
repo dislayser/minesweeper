@@ -1,0 +1,20 @@
+2025-05-26 08:58:51 pid:1 Error: Typed property Game\MineSweeper\Game::$difficult must not be accessed before initialization in D:\Ampps\www\minesweeper\game\MineSweeper\Game.php:30
+Stack trace:
+#0 D:\Ampps\www\minesweeper\game\Command\WS.php(29): Game\MineSweeper\Game->buildField()
+#1 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(2652): {closure}()
+#2 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Events\Select.php(408): Workerman\Worker->acceptTcpConnection()
+#3 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(1602): Workerman\Events\Select->run()
+#4 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(1527): Workerman\Worker::forkWorkersForWindows()
+#5 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(593): Workerman\Worker::forkWorkers()
+#6 D:\Ampps\www\minesweeper\game\Command\WS.php(53): Workerman\Worker::runAll()
+#7 {main}
+2025-05-26 08:59:33 pid:1 Error: Typed property Game\MineSweeper\Game::$difficult must not be accessed before initialization in D:\Ampps\www\minesweeper\game\MineSweeper\Game.php:30
+Stack trace:
+#0 D:\Ampps\www\minesweeper\game\Command\WS.php(30): Game\MineSweeper\Game->buildField()
+#1 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(2652): {closure}()
+#2 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Events\Select.php(408): Workerman\Worker->acceptTcpConnection()
+#3 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(1602): Workerman\Events\Select->run()
+#4 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(1527): Workerman\Worker::forkWorkersForWindows()
+#5 D:\Ampps\www\minesweeper\vendor\workerman\workerman\src\Worker.php(593): Workerman\Worker::forkWorkers()
+#6 D:\Ampps\www\minesweeper\game\Command\WS.php(54): Workerman\Worker::runAll()
+#7 {main}
