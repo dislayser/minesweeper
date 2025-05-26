@@ -37,6 +37,11 @@ class InputBag
         return $result;
     }
 
+    public function getAll() : mixed
+    {
+        return $this->data;
+    }
+
     public function getInt(array|string $keys, ?int $default = null) : ?int
     {
         $result = $this->get($keys, $default);
@@ -62,7 +67,12 @@ class InputBag
         return new self($_GET);
     }
 
-    public function sessionStorage() : self
+    public function post() : self
+    {
+        return new self($_POST);
+    }
+
+    public function session() : self
     {
         return new self($_SESSION);
     }

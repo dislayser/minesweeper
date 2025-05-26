@@ -16,3 +16,13 @@ services:
     container_name: game-php
     volumes:
       - ./:/app
+
+  game-websocket:
+    build:
+      context: ./docker/php
+    container_name: game-websocket
+    volumes:
+      - ./:/app
+    ports:
+      - "8080:8080"
+    command: php /app/game/Command/WS.php start

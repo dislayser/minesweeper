@@ -12,6 +12,7 @@ class Route
         public array  $options = []
     ) {}
 
+    // TODO: Перенести выполнение метода в Router::class
     public function run() : void
     {
         $class = $this->action;
