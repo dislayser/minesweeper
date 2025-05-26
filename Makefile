@@ -23,3 +23,6 @@ docker-pull:
 	
 composer-update:
 	docker compose run --rm game-php composer update
+
+ws-restart:
+	docker-compose restart game-websocket
