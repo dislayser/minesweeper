@@ -27,8 +27,10 @@ $ws->onConnect = function ($conn){
         new Player($conn->id),
         new Field(32, 16)
     );
+    
     ClientStorage::$clients[$conn->id]->setDifficult(Difficult::easy());
     ClientStorage::$clients[$conn->id]->buildField();
+    
     $conn->send(JsonUtil::stringify([
         "type" => "create",
         "cols" => ClientStorage::$clients[$conn->id]->field()->getX(),
@@ -39,7 +41,7 @@ $ws->onConnect = function ($conn){
 
 // Emitted when data received
 $ws->onMessage = function ($conn, $data) {
-    $conn->send('Hello ' . $data);
+    $conn->send($data);
 };
 
 // Emitted when connection closed

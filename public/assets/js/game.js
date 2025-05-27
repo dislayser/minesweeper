@@ -1,4 +1,4 @@
-import { WSGAME } from "./ws_game";
+// import { WSGAME } from "./ws_game";
 
 class Game{
     constructor({
@@ -28,6 +28,8 @@ class Game{
             };
             this.ws.onmessage = (event) => {
                 console.log('Message from server:', event.data);
+                let json = JSON.parse(event.data);
+                console.log(json);
             };
             this.ws.onerror = (error) => {
                 console.error('WebSocket error:', error);
