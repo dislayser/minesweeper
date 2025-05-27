@@ -50,6 +50,12 @@ class Game
         }
     }
 
+    public function openCell($x, $y): ?Cell
+    {
+        return $this->field->getCell($x, $y);
+    }
+
+
     public function openCells(): array 
     {
         $cells = [];
