@@ -136,6 +136,8 @@ class Game{
             cell.attr({
                 src : new Field().getCell("cell" + number)
             });
+
+            // TODO: Сделать открытие ячеек массивом
             if (number === 0) {
                 this.field.find(`[data-row="${row+1}"] img[data-col="${col-1}"]`).click();
                 this.field.find(`[data-row="${row+1}"] img[data-col="${col}"]`).click();
