@@ -28,13 +28,15 @@
 <script>
     var field = new Field();
     var game = new Game();
+    
     game.events();
     field.getCell();
+
     const gameField = $("#gameField");
     gameField.children().each((index, row) => {
         $(row).children().each((index, col) => {
             $(col).attr("src", field.getCell((index > 8 ? "cell" : "cell" + index)));
-        })
-    })
+        });
+    });
 </script>
 {% endblock  %}
