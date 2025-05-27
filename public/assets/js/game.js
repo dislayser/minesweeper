@@ -1,3 +1,5 @@
+import { WSGAME } from "./ws_game";
+
 class Game{
     constructor({
         seed = 1234,
@@ -5,25 +7,38 @@ class Game{
     } = {}) {
         this.seed = seed;
         this.field = field;
-
-        this.ws = new WebSocket('ws://localhost:8080');
-        this.ws.onopen = () => {
-            this.ws.send(JSON.stringify({
-                "token" : $('input[name="_csrf"]').val() ?? null
-            }));
-        };
-        this.ws.onmessage = (event) => {
-            console.log('Message from server:', event.data);
-        };
-        this.ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-        this.ws.onclose = () => {
-            console.log('Disconnected from the server');
-        };
         
+        this.type = {
+            GET_SERVERS : "get_servers",
+            SET_SERVER : "set_server",
+            OPEN_CELL : "open_cell",
+            OPEN_CELLS : "open_cells",
+            SET_FLAG : "set_flag",
+            NEW_SERVER : "new_server"
+        };
         this.flags = [];
-        this.opened = [];
+        this.opened = [];  
+
+        try {
+            this.ws = new WebSocket('ws://localhost:8080');  
+            this.ws.onopen = () => {
+                this.ws.send(JSON.stringify({
+                    "token" : $('input[name="_csrf"]').val() ?? null
+                }));
+            };
+            this.ws.onmessage = (event) => {
+                console.log('Message from server:', event.data);
+            };
+            this.ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+            this.ws.onclose = () => {
+                console.log('Disconnected from the server');
+            };
+            
+        } catch (error) {
+            
+        }
     }
 
     events() {
