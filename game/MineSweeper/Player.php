@@ -25,14 +25,14 @@ class Player
         return $this->playerId;
     }
 
-    protected function win() : bool
+    public function win() : bool
     {
         if ($this->die) throw new PlayerDieExeption("Этот игрок проиграл.");
         $this->win = true;
         return true;
     }
 
-    protected function die() : bool
+    public function die() : bool
     {
         if ($this->win) throw new GameExeption("Этот игрок выиграл.");
         $this->die = true;
