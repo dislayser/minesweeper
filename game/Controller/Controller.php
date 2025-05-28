@@ -31,7 +31,7 @@ class Controller implements ControllerInterface
         ]);
         $render = $twig->render($name, $data);
         echo $render;
-        dump($data);
+        // dump($data);
     }
 
     public function json(array|string $data = [], int $code = 200) : void

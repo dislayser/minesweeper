@@ -23,7 +23,7 @@ class ClientStorage {
 }
 
 // Задаем количество процессов
-$ws->count = 4;
+$ws->count = 8;
 
 // Emitted when new connection come
 $ws->onConnect = function ($conn){
@@ -52,7 +52,8 @@ $ws->onConnect = function ($conn){
     $conn->send(JsonUtil::stringify([
         "type" => "create",
         "cols" => ClientStorage::$clients[$conn->id]->field()->getX(),
-        "rows" => ClientStorage::$clients[$conn->id]->field()->getY()
+        "rows" => ClientStorage::$clients[$conn->id]->field()->getY(),
+        "seed" => ClientStorage::$clients[$conn->id]->field()->getSeed(),
     ]));
 };
 

@@ -103,7 +103,9 @@ class Game{
         row = Math.abs(parseInt(row));
 
         const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
-        if (cell.data("open") == 1) return;
+        if (cell.data("open") == 1)      return;
+        if (cell.data("flag") === true) return;
+        console.log(cell, cell.data("flag"));
         
         // this.openCell(col, row)
         this.ws.send(JSON.stringify({
@@ -162,9 +164,9 @@ class Game{
         if (this.flags[row][col] === "on"){
             this.flags[row][col] = "off";
             cell.attr({
-                "data-flag" : "false",
                 "src": new Field().getCell("cell")
             });
+            cell.removeAttr("data-flag");
         } else {
             this.flags[row][col] = "on";
             cell.attr({
