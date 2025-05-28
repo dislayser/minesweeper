@@ -50,9 +50,13 @@ class Game
         }
     }
 
-    public function openCell($x, $y): ?Cell
+    public function openCell(int $x, int $y): ?Cell
     {
-        return $this->field->getCell($x, $y);
+        $cell = $this->field->getCell($x, $y);
+        if ($cell && $cell->isBomb()) {
+            $this->player->die();
+        }
+        return $cell;
     }
 
 
@@ -65,5 +69,10 @@ class Game
     public function field(): Field
     {
         return $this->field;
+    }
+
+    public function player(): Player
+    {
+        return $this->player;
     }
 }

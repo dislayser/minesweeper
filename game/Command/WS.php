@@ -61,6 +61,13 @@ $ws->onMessage = function ($conn, $data) {
     // $conn->send($data);
     if (!isset(ClientStorage::$clients[$conn->id])) return;
 
+    // Проверка выигрыша
+    if (ClientStorage::$clients[$conn->id]->player()->isWin()) {
+        $conn->send(JsonUtil::stringify([
+            "type" => "win"
+        ]));
+    }
+
     // Обработка сообщений
     $data = JsonUtil::parse($data);
     if (!isset($data["type"])) return;
@@ -79,6 +86,13 @@ $ws->onMessage = function ($conn, $data) {
                 "number" => ($open instanceof Number ? $open->getBombNear() : null),
             ]));
         }
+    }
+
+    // Проверка проигрыша
+    if (ClientStorage::$clients[$conn->id]->player()->isDie()) {
+        $conn->send(JsonUtil::stringify([
+            "type" => "die"
+        ]));
     }
 };
 
