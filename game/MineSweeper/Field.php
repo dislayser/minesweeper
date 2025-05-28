@@ -27,6 +27,7 @@ class Field
     ) {
         $this->x = min(max($this->x, self::MIN_X), self::MAX_X);
         $this->y = min(max($this->y, self::MIN_Y), self::MAX_Y);
+        // TODO: С веб сокета генерирует один и тот же сид
         if (!$seed) $seed = rand(1, 900000000);
         $this->seed = $seed;
     }
