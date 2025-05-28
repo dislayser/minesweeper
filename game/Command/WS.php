@@ -66,6 +66,15 @@ $ws->onMessage = function ($conn, $data) {
         $conn->send(JsonUtil::stringify([
             "type" => "win"
         ]));
+        return;
+    }
+
+    // Проверка проигрыша
+    if (ClientStorage::$clients[$conn->id]->player()->isDie()) {
+        $conn->send(JsonUtil::stringify([
+            "type" => "die"
+        ]));
+        return;
     }
 
     // Обработка сообщений
@@ -87,13 +96,7 @@ $ws->onMessage = function ($conn, $data) {
             ]));
         }
     }
-
-    // Проверка проигрыша
-    if (ClientStorage::$clients[$conn->id]->player()->isDie()) {
-        $conn->send(JsonUtil::stringify([
-            "type" => "die"
-        ]));
-    }
+    return;
 };
 
 // Emitted when connection closed
