@@ -6,9 +6,10 @@ namespace Game\Database\MySQL;
 
 class CreateTable
 {
-    public array $columns = [];
-
-    public function __construct() {}
+    public function __construct(
+        public string $name,
+        public array  $columns = []
+    ) {}
 
     /**
      * Summary of columns
@@ -24,7 +25,11 @@ class CreateTable
 
     public function build(): string
     {
+        $columns = "";
         $sql = <<<SQL
+        CREATE TABLE {$this->name} (
+            {$columns}
+        )
         SQL;
 
         return $sql;

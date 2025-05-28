@@ -13,9 +13,16 @@ class Column
      * @param ColumnType[] $options
      */
     public function __construct(
-        public string $name,    
-        public string $type,    
+        public string $name,
         public array  $options = [],    
     ) {
+    }
+
+    public function getSql(): string
+    {
+        $sql = <<<SQL
+        
+        SQL;
+        return $sql;
     }
 }
