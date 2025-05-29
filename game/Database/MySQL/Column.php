@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Game\Database\MySQL;
 
+use Game\Service\Util\StringUtil;
+
 class Column
 {
     public string $name;
@@ -21,7 +23,7 @@ class Column
         ColumnMod|array $options = [],    
     ) {
         if (!is_array($options)) $options = [$options];
-        $this->name = $name;
+        $this->name = StringUtil::toSnakeCase($name);
         $this->type = $type;
         $this->options = $options;
     }
