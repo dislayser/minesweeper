@@ -6,16 +6,24 @@ namespace Game\Database\MySQL;
 
 class Column
 {
+    public string $name;
+    public ColumnType $type;
+    public ColumnMod|array $options = [];  
     /**
      * Summary of __construct
      * @param string $name
-     * @param string $type
-     * @param ColumnType[] $options
+     * @param ColumnType $type
+     * @param ColumnMod[] $options
      */
     public function __construct(
-        public string $name,
-        public array  $options = [],    
+        string $name,
+        ColumnType $type,
+        ColumnMod|array $options = [],    
     ) {
+        if (!is_array($options)) $options = [$options];
+        $this->name = $name;
+        $this->type = $type;
+        $this->options = $options;
     }
 
     public function getSql(): string

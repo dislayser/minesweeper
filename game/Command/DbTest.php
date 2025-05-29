@@ -6,6 +6,7 @@ namespace Game\Command;
 
 use Game\Database\MySQL\Column;
 use Game\Database\MySQL\ColumnType;
+use Game\Database\MySQL\ColumnMod;
 use Game\Database\MySQL\CreateTable;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -29,34 +30,13 @@ class DbTest extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $create = new CreateTable("users", [
-            new Column("id", [
-                new ColumnType\Primary(),
-                new ColumnType\IntegerType(),
-            ]),
-            new Column("name", [
-                new ColumnType\VarcharType(255),
-                new ColumnType\NullType(),
-            ]),
-            new Column("login", [
-                new ColumnType\VarcharType(31),
-                new ColumnType\UniqType(),
-            ]),
-            new Column("password", [
-                new ColumnType\VarcharType(255),
-            ]),
-            new Column("comment", [
-                new ColumnType\TextType(),
-                new ColumnType\NullType(),
-            ]),
-            new Column("created", [
-                new ColumnType\Def("CURRENT_TIMESTAMP"),
-                new ColumnType\DateTimeType(),
-                new ColumnType\NullType(),
-            ]),
-            new Column("deleted", [
-                new ColumnType\BoolType(),
-                new ColumnType\Def(0),
-            ]),
+            new Column("id", new ColumnType\IntegerType(), new ColumnMod\Primary()),
+            new Column("name", new ColumnType\VarcharType(255), new ColumnMod\NullValue()),
+            new Column("login", new ColumnType\VarcharType(31), new ColumnMod\UniqValue()),
+            new Column("password", new ColumnType\VarcharType(255)),
+            new Column("comment", new ColumnType\TextType(), new ColumnMod\NullValue()),
+            new Column("created", new ColumnType\DateTimeType(), new ColumnMod\DefaultValue("CURRENT_TIMESTAMP")),
+            new Column("deleted", new ColumnType\BoolType(), new ColumnMod\DefaultValue(0)),
         ]);
 
         dump($create);
