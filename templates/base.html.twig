@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,8 +24,8 @@
     <!-- Мои файлы -->
     <link href="/assets/css/custom.css" rel="stylesheet">
 </head>
-<body data-bs-theme="{{ user.theme }}">
-    <main>
+<body data-bs-theme="{{ user.theme }}" class="d-flex flex-column h-100">
+    <main class="m-auto">
         {% block content %}
         {% endblock %}
     </main>

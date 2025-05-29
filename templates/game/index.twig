@@ -7,9 +7,9 @@
         <button type="button" class="btn btn-outline-secondary">Опции</button>
     </div>
 </div> #}
-<div class="container-fluid my-5">
+<div>
     <div class="d-flex flex-column user-select-none" id="gameField">
-    {% set field = content.field %}
+    {# {% set field = content.field %}
     {% for row in 0..(field.getY - 1) %}
         <div class="d-flex justify-content-center" data-row="{{ row }}">
         {% for col in 0..(field.getX - 1) %}
@@ -17,7 +17,7 @@
             <img class="cell-16" data-col="{{ col }}" draggable="false"></img>
         {% endfor %}
         </div>
-    {% endfor %}
+    {% endfor %} #}
     </div>
 </div>
 {% endblock %}

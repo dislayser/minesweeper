@@ -8,8 +8,9 @@ class Number extends Cell
 {
     private int $bombNear;
 
-    public function setBombNear($bombNear): void
+    public function setBombNear(int $bombNear): void
     {
+        $bombNear = min(max($bombNear, 0), 8);
         $this->bombNear = $bombNear;  
     }
 

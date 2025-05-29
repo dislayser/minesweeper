@@ -14,8 +14,8 @@ class Game extends Entity
     {
         return [
             "id" => 1,
-            "rows" => 16,
-            "cols" => 32,
+            "rows" => 10,
+            "cols" => 10,
             "seed" => null,
             "difficult_id" => 1,
         ];

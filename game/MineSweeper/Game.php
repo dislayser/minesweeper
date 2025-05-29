@@ -60,9 +60,21 @@ class Game
     }
 
 
-    public function openCells(): array 
+    /**
+     * Summary of openCells
+     * @param array[array] $cells
+     * @return Cell[][]
+     */
+    public function openCells(array $cells): array 
     {
         $cells = [];
+        foreach ($cells as $row => $cols) {
+            foreach ($cols as $col => $click) {
+                if ($click === "click") {
+                    $cells[] = $this->openCell($col, $row);
+                }
+            }
+        }
         return $cells;
     }
 
