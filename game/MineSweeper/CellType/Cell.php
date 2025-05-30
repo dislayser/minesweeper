@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Game\MineSweeper\CellType;
 
-use Game\Exeption\GameExeption;
+use Game\Exception\GameException;
 
 class Cell
 {
@@ -26,7 +26,7 @@ class Cell
         if (!$this->isOpen()){
             $this->opened = true;
         }else if ($this->isBomb()){
-            throw new GameExeption("Это бомба.");
+            throw new GameException("Это бомба.");
         }
         return $this;
     }
@@ -34,10 +34,10 @@ class Cell
     public function setFlag(): static
     {
         if ($this->isOpen()){
-            throw new GameExeption("Ячейка {$this->x}x{$this->y} уже открыта.");
+            throw new GameException("Ячейка {$this->x}x{$this->y} уже открыта.");
         }
         if ($this->isOpen() && $this->isBomb()){
-            throw new GameExeption("Ячейка {$this->x}x{$this->y} уже открыта (бомба).");
+            throw new GameException("Ячейка {$this->x}x{$this->y} уже открыта (бомба).");
         }
         $this->flag = true;
         return $this;
@@ -48,7 +48,7 @@ class Cell
         if (!$this->isOpen()) {
             $this->bomb = true;
         } else {
-            throw new GameExeption("Ячейка {$this->x}x{$this->y} уже открыта.");
+            throw new GameException("Ячейка {$this->x}x{$this->y} уже открыта.");
         }
         return $this;
     }

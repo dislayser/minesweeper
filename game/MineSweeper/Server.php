@@ -2,7 +2,7 @@
 
 namespace Game\MineSweeper;
 
-use Exception;
+use Game\Exception\GameException;
 
 class Server
 {
@@ -27,7 +27,7 @@ class Server
     public function getPlayer(?string $playerId = null) : Player|array
     {
         if ($playerId) {
-            if (!isset($this->players[$playerId])) throw new Exception("Такого игрока нет");
+            if (!isset($this->players[$playerId])) throw new GameException("Такого игрока нет");
             return $this->players[$playerId];
         }else{
             return $this->players;

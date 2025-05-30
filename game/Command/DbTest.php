@@ -29,17 +29,27 @@ class DbTest extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $create = new CreateTable("users", [
-            new Column("id", new ColumnType\IntegerType(), new ColumnMod\Primary()),
-            new Column("name", new ColumnType\VarcharType(255), new ColumnMod\NullValue()),
-            new Column("login", new ColumnType\VarcharType(31), new ColumnMod\UniqValue()),
-            new Column("password", new ColumnType\VarcharType(255)),
-            new Column("comment", new ColumnType\TextType(), new ColumnMod\NullValue()),
-            new Column("created", new ColumnType\DateTimeType(), new ColumnMod\DefaultValue("CURRENT_TIMESTAMP")),
-            new Column("deleted", new ColumnType\BoolType(), new ColumnMod\DefaultValue(0)),
+        $createUsers = new CreateTable("users", [
+            new Column("id",        new ColumnType\IntegerType(), new ColumnMod\Primary()),
+            new Column("name",      new ColumnType\VarcharType(255), new ColumnMod\NullValue()),
+            new Column("login",     new ColumnType\VarcharType(31), new ColumnMod\UniqValue()),
+            new Column("password",  new ColumnType\VarcharType(255)),
+            new Column("comment",   new ColumnType\TextType(), new ColumnMod\NullValue()),
+            new Column("created",   new ColumnType\DateTimeType(), new ColumnMod\DefaultValue("CURRENT_TIMESTAMP")),
+            new Column("deleted",   new ColumnType\BoolType(), new ColumnMod\DefaultValue(0)),
         ]);
 
-        dump($create);
+        $createFiles = new CreateTable("files", [
+            new Column("id",        new ColumnType\IntegerType(), new ColumnMod\Primary()),
+            new Column("userId",    new ColumnType\IntegerType(), new ColumnMod\NullValue()),
+            new Column("title",     new ColumnType\VarcharType(255), new ColumnMod\NullValue()),
+            new Column("name",      new ColumnType\VarcharType(255), new ColumnMod\UniqValue()),
+            new Column("type",      new ColumnType\VarcharType(31)),
+            new Column("created",   new ColumnType\DateTimeType(), new ColumnMod\DefaultValue("CURRENT_TIMESTAMP")),
+            new Column("deleted",   new ColumnType\BoolType(), new ColumnMod\DefaultValue(0)),
+        ]);
+
+        dump($createUsers, $createFiles);
         return Command::SUCCESS;
     }
 }

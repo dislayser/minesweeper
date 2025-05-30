@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Game\Database;
 
-use Game\Exeption\DatabaseExeption;
+use Game\Exception\DatabaseException;
 
 class Connection
 {
