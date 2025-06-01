@@ -11,6 +11,8 @@ $application = new Application();
 
 // Добавляем свои команды
 $application->add(new Command\Start());
+$application->add(new Command\Test());
+$application->add(new Command\DbTest());
 
 // Запускаем приложение
 $application->run();

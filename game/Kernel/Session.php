@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Game\Kernel;
 
 class Session
@@ -8,7 +10,9 @@ class Session
 
     public function start() : void
     {
-        if (session_status() === PHP_SESSION_NONE || empty($_SESSION)) session_start();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     public function id() : string

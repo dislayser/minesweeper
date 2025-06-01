@@ -1,42 +1,36 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-{# <div class="container my-3">
-    <h5>Сапер</h5>
-    <div class="d-flex gap-3">
-        <button type="button" class="btn btn-outline-secondary">Опции</button>
+    {% include("game/config.twig") %}
+    <div class="mx-auto">
+        <div class="d-flex flex-column user-select-none" id="gameField"></div>
     </div>
-</div> #}
-<div class="container-fluid my-5">
-    <div class="d-flex flex-column user-select-none" id="gameField">
-    {% set field = content.field %}
-    {% for row in 0..(field.getY - 1) %}
-        <div class="d-flex justify-content-center" data-row="{{ row }}">
-        {% for col in 0..(field.getX - 1) %}
-            {% set cell = field.getCell(col, row) %}
-            <img class="cell-16" data-col="{{ col }}" draggable="false"></img>
-        {% endfor %}
-        </div>
-    {% endfor %}
-    </div>
-</div>
 {% endblock %}
 
 {% block js_render %}
 <script src="/assets/js/field.js"></script>
 <script src="/assets/js/game.js"></script>
 <script>
-    var field = new Field();
-    var game = new Game();
-    
-    game.events();
-    field.getCell();
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
 
-    const gameField = $("#gameField");
-    gameField.children().each((index, row) => {
-        $(row).children().each((index, col) => {
-            $(col).attr("src", field.getCell((index > 8 ? "cell" : "cell" + index)));
+    var game = new Game({
+        field: $("#gameField")
+    });
+    game.events();
+
+    $("#startGame").click(() => {
+        game.start({
+            cols : $('[name="cols"]').val(),
+            rows : $('[name="rows"]').val(),
+            seed : $('[name="seed"]').val(),
+            difficult : $('[name="difficult"]').val()
         });
+    });
+
+    $("#randomSeed").click(() => {
+        $('[name="seed"]').val(getRandomInt(1000000));
     });
 </script>
 {% endblock  %}

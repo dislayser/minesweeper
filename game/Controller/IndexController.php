@@ -11,16 +11,6 @@ class IndexController extends Controller
 {
     public function index() : void
     {
-        
-        $game = new Game(
-            new Player(),
-            new Field(32,16)
-        );
-        $game->setDifficult(Difficult::hard());
-        $game->buildField();
-
-        $this->render("game/index.twig", [
-            "field" => $game->field()
-        ]);
+        $this->render("game/index.twig", []);
     }
 }

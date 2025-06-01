@@ -6,4 +6,4 @@ namespace Game\Database\MySQL\ColumnType;
 
 use Game\Database\MySQL\ColumnType;
 
-class Text extends ColumnType {}
+class DateTimeType extends ColumnType {}

@@ -26,3 +26,19 @@ services:
     ports:
       - "8080:8080"
     command: php /app/game/Command/WS.php start
+
+  game-mysql:
+    image: mysql:9.3
+    container_name: game-mysql
+    environment:
+      MYSQL_DATABASE: game
+      MYSQL_USER: app
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data: # Объявляем том для данных MySQL

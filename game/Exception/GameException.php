@@ -1,11 +1,15 @@
 <?php
 
-namespace Game\Exeption;
+// TODO: допустил ошибку в словах exception ))) - надо будет поправить
+
+declare(strict_types=1);
+
+namespace Game\Exception;
 
 use Exception;
 use Throwable;
 
-class GameExeption extends Exception
+class GameException extends Exception
 {
     protected $context = [];
 

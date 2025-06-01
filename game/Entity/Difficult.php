@@ -15,7 +15,7 @@ class Difficult extends Entity
         return [
             "id" => 1,
             "name" => "easy",
-            "bombs_ratio" => 4,
+            "bombs_ratio" => 10,
         ];
     }
 

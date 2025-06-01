@@ -2,9 +2,7 @@
 
 namespace Game;
 
-use Game\Controller\GameApiController;
-use Game\Controller\IndexController;
-use Game\Controller\SSEController;
+use Game\Controller;
 use Game\Kernel\InputBag;
 use Game\Kernel\Route;
 use Game\Kernel\Router;
@@ -22,15 +20,24 @@ class Kernel
 
         $router = new Router();
         $router
-            ->addRoute(
-                new Route("/", IndexController::class, "index", ["GET"])
-            )
-            ->addRoute(
-                new Route("/api", IndexController::class, "api", ["GET"])
-            )
-            ->addRoute(
-                new Route("/api/v1/game", GameApiController::class, "apiGame", ["GET"])
-            )
+            ->addRoute(new Route(
+                "/",
+                Controller\IndexController::class,
+                "index",
+                ["GET"]
+            ))
+            ->addRoute(new Route(
+                "/api",
+                Controller\IndexController::class,
+                "api",
+                ["GET"]
+            ))
+            ->addRoute(new Route(
+                "/api/v1/game",
+                Controller\GameApiController::class,
+                "apiGame",
+                ["GET"]
+            ))
         ;
 
         $bag = (new InputBag())->server();
