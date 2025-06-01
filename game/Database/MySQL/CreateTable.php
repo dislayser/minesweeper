@@ -13,6 +13,11 @@ class CreateTable
     /** @var Column[] $columns */
     public array  $columns = [];
     
+    /**
+     * Summary of __construct
+     * @param string $name
+     * @param Column[] $columns
+     */
     public function __construct(
         string $name,
         array  $columns = []

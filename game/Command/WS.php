@@ -19,6 +19,9 @@ $ws = new Worker('websocket://0.0.0.0:8080');
 
 // Глобальное хранилище клиентов
 class ClientStorage {
+    /**
+     * @var Game[] $clients 
+     */
     public static $clients = [];
 }
 
@@ -27,39 +30,19 @@ $ws->count = 8;
 
 // Emitted when new connection come
 $ws->onConnect = function ($conn){
-    $server = (new ServerEntity())->get(1);
-    $game = (new GameEntity())->get($server["game_id"]);
-    $difficult = (new DifficultEntity())->get($game["difficult_id"]);
+    // $server = (new ServerEntity())->get(1);
+    // $game = (new GameEntity())->get($server["game_id"]);
+    // $difficult = (new DifficultEntity())->get($game["difficult_id"]);
+    if (isset(ClientStorage::$clients[$conn->id])) return;
 
-    // Создание нового клиента
     ClientStorage::$clients[$conn->id] = new Game(
-        new Player($conn->id),
-        new Field(
-            $game["cols"],
-            $game["rows"]
-        )
+        new Player(),
+        new Field(10,10)
     );
-    
-    // Установка сложности
-    ClientStorage::$clients[$conn->id]->setDifficult(new Difficult(
-        $difficult["name"],
-        $difficult["bombs_ratio"],
-    ));
-
-    // Постройка игры
-    ClientStorage::$clients[$conn->id]->buildField();
-    
-    $conn->send(JsonUtil::stringify([
-        "type" => "create",
-        "cols" => ClientStorage::$clients[$conn->id]->field()->getX(),
-        "rows" => ClientStorage::$clients[$conn->id]->field()->getY(),
-        "seed" => ClientStorage::$clients[$conn->id]->field()->getSeed(),
-    ]));
 };
 
 // Emitted when data received
 $ws->onMessage = function ($conn, $data) {
-    // $conn->send($data);
     if (!isset(ClientStorage::$clients[$conn->id])) return;
 
     // Проверка выигрыша
@@ -81,6 +64,7 @@ $ws->onMessage = function ($conn, $data) {
     // Обработка сообщений
     $data = JsonUtil::parse($data);
     if (!isset($data["type"])) return;
+
     if ($data["type"] === "open") {
         $open = ClientStorage::$clients[$conn->id]->openCell(
             (int) $data["x"],
@@ -97,6 +81,42 @@ $ws->onMessage = function ($conn, $data) {
             ]));
         }
     }
+
+    if ($data["type"] === "create") {
+        if (isset($data["cols"], $data["rows"], $data["seed"], $data["difficult"])) {
+            dump($data);
+            $rows = (int) $data["rows"];
+            $cols = (int) $data["cols"];
+            $seed = (int) $data["seed"];
+            $difficult = (string) $data["difficult"];
+
+            // Validation
+            if ($rows < 2 || $cols < 2 || empty($seed) || !method_exists(Difficult::class, $difficult)) return;
+
+            $client = &ClientStorage::$clients[$conn->id];
+
+            // Создание нового клиента
+            $client = new Game(
+                new Player($conn->id),
+                new Field($cols, $rows, $seed)
+            );
+            
+            // Установка сложности
+            $client->setDifficult(Difficult::$difficult());
+
+            // Постройка игры
+            $client->buildField();
+            
+            // Отправка клиенту
+            $conn->send(JsonUtil::stringify([
+                "type" => "create",
+                "cols" => $client->field()->getX(),
+                "rows" => $client->field()->getY(),
+                "seed" => $client->field()->getSeed(),
+            ]));
+        }
+    }
+
     return;
 };
 

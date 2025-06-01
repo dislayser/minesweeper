@@ -56,7 +56,7 @@ class Game{
             for (let row = 0; row < data.rows; row++) {
                 const $row = $("<div>").addClass("d-flex justify-content-center").attr("data-row", row);
                 for (let col = 0; col < data.cols; col++) {
-                    const $col = $("<img>").addClass("cell-16")
+                    const $col = $("<img>").addClass("cell-32")
                     .attr({
                         "draggable" : "false",
                         "data-col" : col,
@@ -70,6 +70,21 @@ class Game{
 
         this.field.empty();
         this.field.append(field);
+    }
+
+    start({
+        cols = 10,
+        rows = 10,
+        seed = 1234,
+        difficult = "easy"
+    } = {}) {
+        this.ws.send(JSON.stringify({
+            "type" : "create",
+            "cols" : cols,
+            "rows" : rows,
+            "seed" : seed,
+            "difficult" : difficult
+        }));
     }
 
     events() {
