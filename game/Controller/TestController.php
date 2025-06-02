@@ -16,7 +16,7 @@ class TestController extends Controller
             $key,
             "https://api.deepseek.com"
         );
-        dd($api->get());
+        $api->get();
         echo "<br>";
     }
 }

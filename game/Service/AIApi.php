@@ -6,6 +6,8 @@ namespace Game\Service;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
 
 class AIApi
@@ -28,21 +30,29 @@ class AIApi
     public function get(array $content = []) : void
     {
         $data = [
-            "model" => "deepseek-chat", 
-            "messages" => [
-                ["role" => "system", "content" => "You are a helpful assistant."],
-                ["role" => "user", "content" => "Hello!"]
+            'model' => 'deepseek-chat', // или другая модель, если требуется
+            'messages' => [
+                ['role' => 'user', 'content' => 'Привет! Как дела?']
             ],
-            "stream" => false,
+            'temperature' => 0.7,  // опциональные параметры
+            'max_tokens' => 1000,
             ...$content
         ];
         try {
-            $this->client->get($this->url . "/chat/completions", [
-                RequestOptions::QUERY => $data,
-                RequestOptions::HEADERS => ["Authorization" => "Bearer {$this->key}"]
+            $response = $this->client->post($this->url . "/chat/completions", [
+                RequestOptions::JSON => $data,
+                RequestOptions::HEADERS => [
+                    "Content-Type" => "application/json",
+                    "Authorization" => "Bearer {$this->key}"
+                ]
             ]);
+            $responseData = $response->getBody();
+            dd($responseData);
         } catch (Exception $e) {
             dump($e);
+            
+        } catch (ClientException|RequestException $e) {
+            dump($e->getBody());
         }
     }
 }
