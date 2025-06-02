@@ -20,7 +20,8 @@ class Route
         $class = $this->action;
         $parts = explode("::", $this->action, 2);
         $method = $parts[1] ?? "index";
-        if (!class_exists($class)){
+        
+        if (!method_exists($class, $method)){
             throw new \InvalidArgumentException("Такого класса не существует: {$class}");
         }
 

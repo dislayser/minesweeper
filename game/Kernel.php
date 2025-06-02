@@ -27,15 +27,9 @@ class Kernel
                 ["GET"]
             ))
             ->addRoute(new Route(
-                "/api",
-                Controller\IndexController::class,
-                "api",
-                ["GET"]
-            ))
-            ->addRoute(new Route(
-                "/api/v1/game",
-                Controller\GameApiController::class,
-                "apiGame",
+                "/test",
+                Controller\TestController::class,
+                "test",
                 ["GET"]
             ))
         ;

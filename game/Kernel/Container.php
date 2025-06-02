@@ -9,32 +9,46 @@ use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
-    /** @var object[] $containers */
-    protected array $containers = [];
+    /** @var array<int|string, callable|object> */
+    protected array $services = [];
 
-    public function __construct() {}
-
-    public function has(int|string $id) : bool
-    {
-        return isset($this->containers[$id]);
-    }
-
-    public function register(int|string $id, object $object): void
-    {
-        $this->containers[$id] = $object;
-    }
-    
     /**
-     * @param int|string $name
-     * @throws ContainerException
+     * Проверяет, существует ли сервис с указанным идентификатором.
+     *
+     * @param int|string $id
+     * @return bool
+     */
+    public function has(int|string $id): bool
+    {
+        return isset($this->services[$id]);
+    }
+
+    /**
+     * Регистрирует сервис в контейнере.
+     *
+     * @param int|string $id
+     * @param callable|object $service
+     */
+    public function register(int|string $id, callable|object $service): static
+    {
+        $this->services[$id] = $service;
+        return $this;
+    }
+
+    /**
+     * Возвращает сервис по указанному идентификатору.
+     *
+     * @param int|string $id
+     * @throws ContainerException Если сервис не найден.
      * @return object
      */
     public function get(int|string $id): object
     {
-        if (isset($this->containers[$id])) {
-            return $this->containers[$id];
-        }else{
-            throw new ContainerException("Container not found: " . $id, 1);
+        if (!isset($this->services[$id])) {
+            throw new ContainerException("Service not found: " . $id, 1);
         }
+
+        $entry = $this->services[$id];
+        return $entry instanceof \Closure ? $entry() : $entry;
     }
 }

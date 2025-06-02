@@ -18,4 +18,6 @@ class Server extends Entity
             "game_id" => 1,
         ];
     }
+
+    
 }

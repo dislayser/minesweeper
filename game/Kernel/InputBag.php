@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Game\Kernel;
 
+use Game\Kernel\InputBag\CookieBag;
+use Game\Kernel\InputBag\ServerBag;
+use Game\Kernel\InputBag\SessionBag;
+
 class InputBag
 {
-    protected array $data;
-    public function __construct(array $data = []) {
+    protected mixed $data;
+    public function __construct(mixed $data = []) {
         $this->data = $data;
     }
 
@@ -69,6 +73,11 @@ class InputBag
         return new self($_GET);
     }
 
+    public function files() : self
+    {
+        return new self($_FILES);
+    }
+
     public function post() : self
     {
         return new self($_POST);
@@ -76,17 +85,17 @@ class InputBag
 
     public function session() : self
     {
-        return new self($_SESSION);
+        return new SessionBag($_SESSION);
     }
 
     public function server() : self
     {
-        return new self($_SERVER);
+        return new ServerBag($_SERVER);
     }
 
     public function cookie() : self
     {
-        return new self($_COOKIE);
+        return new CookieBag($_COOKIE);
     }
 
     protected function parseKeys(array|string $keys) : array
