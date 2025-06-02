@@ -88,6 +88,11 @@ class InputBag
         return new SessionBag($_SESSION);
     }
 
+    public function env() : self
+    {
+        return new self($_ENV);
+    }
+
     public function server() : self
     {
         return new ServerBag($_SERVER);

@@ -2,6 +2,7 @@
 
 namespace Game;
 
+use Dotenv\Dotenv;
 use Game\Controller;
 use Game\Kernel\InputBag;
 use Game\Kernel\Route;
@@ -15,6 +16,9 @@ class Kernel
 
     public function run() : void
     {
+        $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
+        $dotenv->load();
+
         $sess = new Session();
         $sess->start();
 

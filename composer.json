@@ -11,6 +11,8 @@
         "symfony/var-dumper": "^7.2",
         "twig/twig": "^3.0",
         "workerman/workerman": "^5.1",
-        "psr/log": "^3.0"
+        "psr/log": "^3.0",
+        "guzzlehttp/guzzle": "^7.9",
+        "vlucas/phpdotenv": "^5.6"
     }
 }
