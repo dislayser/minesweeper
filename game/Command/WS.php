@@ -27,14 +27,11 @@ $ws->count = 8;
 
 // Emitted when new connection come
 $ws->onConnect = function ($conn){
-    // $server = (new ServerEntity())->get(1);
-    // $game = (new GameEntity())->get($server["game_id"]);
-    // $difficult = (new DifficultEntity())->get($game["difficult_id"]);
     if (isset(ClientStorage::$clients[$conn->id])) return;
 
     ClientStorage::$clients[$conn->id] = new Game(
         new Player(),
-        new Field(10,10)
+        new Field(10, 10)
     );
 };
 
