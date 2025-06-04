@@ -8,6 +8,7 @@ use Game\Database\MySQL\Column;
 use Game\Database\MySQL\ColumnType;
 use Game\Database\MySQL\ColumnMod;
 use Game\Database\MySQL\CreateTable;
+use Game\Database\QueryBuilder;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -23,7 +24,7 @@ class DbTest extends Command
     protected function configure()
     {
         $this
-            ->setDescription('Старт игры')
+            ->setDescription('Тестирование создания таблиц')
             ->setHelp('Эта команда показывает пример использования Symfony Console.');
     }
 
@@ -86,7 +87,17 @@ class DbTest extends Command
             new Column("deleted",   new ColumnType\BoolType(), new ColumnMod\DefaultValue(0)),
         ]);
 
+        $qb = (new QueryBuilder())
+            ->select(["table_name"])
+            ->from("information_schema.tables")
+            ->andWhere("table_schema = :table")
+            ->addParam("table", "app")
+        ;
+        
+        dd((string) $qb, $qb->getParams());
+        
         dump($createUsers, $createFiles);
+        
         return Command::SUCCESS;
     }
 }

@@ -1,10 +1,7 @@
 <?php
-
+// TODO: WS нужно переписать
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use Game\Entity\Server as ServerEntity;
-use Game\Entity\Game as GameEntity;
-use Game\Entity\Difficult as DifficultEntity;
 use Game\MineSweeper\CellType\Number;
 use Game\MineSweeper\Difficult;
 use Game\MineSweeper\Field;

@@ -9,6 +9,7 @@ use Game\Exception\DatabaseException;
 
 class QueryBuilder
 {
+    public const TAB = "    ";
     public const SORT_ASC = "ASC";
     public const SORT_DESC = "DESC";
     public const JOIN_INNER = "INNER JOIN";
@@ -40,7 +41,7 @@ class QueryBuilder
         return $this;
     }
 
-    public function from(string $table, string $as) : static
+    public function from(string $table, ?string $as = null) : static
     {
         $this->from["table"] = $table;
         $this->from["as"] = $as;

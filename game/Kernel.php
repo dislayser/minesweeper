@@ -2,6 +2,7 @@
 
 namespace Game;
 
+use Dotenv\Dotenv;
 use Game\Controller;
 use Game\Kernel\InputBag;
 use Game\Kernel\Route;
@@ -15,6 +16,9 @@ class Kernel
 
     public function run() : void
     {
+        $dotenv = Dotenv::createImmutable(__DIR__ . "/..");
+        $dotenv->load();
+
         $sess = new Session();
         $sess->start();
 
@@ -27,15 +31,9 @@ class Kernel
                 ["GET"]
             ))
             ->addRoute(new Route(
-                "/api",
-                Controller\IndexController::class,
-                "api",
-                ["GET"]
-            ))
-            ->addRoute(new Route(
-                "/api/v1/game",
-                Controller\GameApiController::class,
-                "apiGame",
+                "/test",
+                Controller\TestController::class,
+                "test",
                 ["GET"]
             ))
         ;
