@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Game\Database;
 
+use Game\Database\QueryBuilder\InsertBuilder;
 use Game\Service\Util\StringUtil;
 use Game\Exception\DatabaseException;
 
@@ -39,6 +40,16 @@ class QueryBuilder
         $select = array_values($select);
         $this->select = [...$this->select, ...$select];
         return $this;
+    }
+
+    public function insert(string $table): InsertBuilder
+    {
+        return (new InsertBuilder())->insert($table);
+    }
+
+    public function update(string $table): InsertBuilder
+    {
+        return (new InsertBuilder())->insert($table);
     }
 
     public function from(string $table, ?string $as = null) : static

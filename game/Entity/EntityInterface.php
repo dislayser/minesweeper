@@ -7,7 +7,8 @@ namespace Game\Entity;
 interface EntityInterface
 {
     public function get(int $id) : ?array;
-    public function new(array $data) : ?int;
-    public function update(int $id, array $data) : ?array;
-    public function delete(int $id) : ?array;
+    public function add(array $data) : int;
+    public function set(int $id, array $data) : ?array;
+    public function del(int $id) : bool;
+    public function remove(int $id) : bool;
 }
