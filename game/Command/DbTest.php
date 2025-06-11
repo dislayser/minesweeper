@@ -94,9 +94,9 @@ class DbTest extends Command
             ->addParam("table", "app")
         ;
         
-        dd((string) $qb, $qb->getParams());
-        
         dump($createUsers, $createFiles);
+        
+        dd((string) $qb, $qb->getParams());
         
         return Command::SUCCESS;
     }
