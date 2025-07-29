@@ -26,15 +26,22 @@ export class Game{
             };
             this.ws.onmessage = (event) => {
                 console.log(event.data);
+                const json = JSON.parse(event.data);
+                console.log(json);
 
-                let json = JSON.parse(event.data);
-
-                // Обработка собщений
-                if (json.type && json.type == "create"){
+                if (json.type && json.type == this.type.CREATE){
                     this.createField(json);
                 }
-                if (json.type && json.type == "cell"){
-                    this.openCell(json.col, json.row, json.isBomb, json.number);
+                if (json.type && json.type == this.type.OPEN_CELL){
+                    for (let i = 0; i < json.data.length; i++) {
+                        console.log(json.data[i]);
+                        this.openCell(
+                            json.data[i].col,
+                            json.data[i].row,
+                            json.data[i].isBomb,
+                            json.data[i].number
+                        );
+                    }
                 }
             };
             this.ws.onerror = (error) => {
@@ -145,7 +152,7 @@ export class Game{
         const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
         if (!cell.length > 0) return;
 
-        if (this.cells[row][col].isOpen() == 1) return;
+        if (this.cells[row][col].isOpen()) return;
         if (this.cells[row][col]) return;
         
         if (isBomb) {
@@ -158,6 +165,8 @@ export class Game{
             });
         }
         cell.attr("data-open", "1");
+
+        this.cells[row][col].open(number);
     }
 
     toggleFlag(col, row){

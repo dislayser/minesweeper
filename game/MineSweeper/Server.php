@@ -48,6 +48,17 @@ class Server implements Interfaces\ServerInterface
         return $players;
     }
 
+    public function getPlayerById(int|string $playerId): ?Interfaces\PlayerInterface
+    {
+        $player = null;
+        foreach ($this->getPlayers() as $p) {
+            if ($p->getId() === $playerId) {
+                $player = $p;
+            }
+        }
+        return $player;
+    }
+
     public function getGameByPlayer(Interfaces\PlayerInterface $player): ?Interfaces\GameInterface
     {
         foreach ($this->getGames() as $game) {

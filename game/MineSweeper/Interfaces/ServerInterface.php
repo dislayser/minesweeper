@@ -18,6 +18,8 @@ interface ServerInterface
      */
     public function getPlayers(): array;
 
+    public function getPlayerById(int|string $playerId): ?PlayerInterface;
+    
     public function getGameByPlayer(PlayerInterface $player): ?GameInterface;
 
     public function addGame(GameInterface $game): static;

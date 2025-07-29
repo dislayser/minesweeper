@@ -14,7 +14,7 @@ class Player implements Interfaces\PlayerInterface
     private bool $win = false;
 
     public function __construct(
-        string $id,
+        int|string $id,
         private Interfaces\LiveInterface $live
     ) {
         $this->id = $id;

@@ -1,5 +1,5 @@
 export class Field{
-    constructor($field = $("#gameField")){
+    constructor(){
         this.rows;
         this.cols;
     }
@@ -79,20 +79,6 @@ export class Field{
             h1: pq0 + pq1 + "aVBMVEW9vb17e3u1AAC9u7u8qqq4Zma4X1+3SUm1FBS1Cwu8tLS8r6+2OTm3MjK2Gxu9uLi8oKC7mpq7lpa6ioq7goK4VFS4UlK3Pz+2GBi1ERG0CAi7pqa5dXW6bGy4Vla3QUG2Jye2JSW1IiJO9tWMAAAAmklEQVQoz6XS2QqDMBBA0elkNRpr3ap27/9/ZCcKbYeYB/ESEDxMwBg4pAJO3Gitt5+k8nZ8dlVEQk24ZBwn8cBvr5xRj3/dGWl649tLfQ5U8g0LvIbnMSOaGIFrYSE+9cvNG/YxyZsNksnok0ucG+r4oN400KlGQEwa0SSOt0JsEgRKi80/JTd2LE6rpJHyianB0tTOu0Er1QfBogVXL05vjgAAAABJRU5ErkJggg=="
         };
         
-        // function cell(src, id) {
-        //     return $("<img>").attr({
-        //         "src" : src,
-        //         "id" : id,
-        //     });
-        // }
-        // for (var key in imgs){
-        //     let image = cell(imgs[key], key);
-        //     $("body").append(image);
-        // }
-        if (imgs[type]){
-            return imgs[type];
-        }else{
-            return null;
-        }
+        return imgs[type] ?? null;
     }
 }
