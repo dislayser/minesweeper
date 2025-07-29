@@ -73,6 +73,7 @@ export class Game{
                     this.cells[row][col] = new Cell({
                         col : col,
                         row : row,
+                        ui : $col,
                     });
                     $row.append($col);
                 }
@@ -149,12 +150,12 @@ export class Game{
     }
 
     openCell(col, row, isBomb, number){
-        const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
+        const cell = this.cells[row][col].ui;
         if (!cell.length > 0) return;
 
         if (this.cells[row][col].isOpen()) return;
-        if (this.cells[row][col]) return;
-        
+        if (this.cells[row][col].isFlag()) return;
+
         if (isBomb) {
             cell.attr({
                 src : new Field().getCell("bomb")
@@ -172,8 +173,8 @@ export class Game{
     toggleFlag(col, row){
         const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
         if (!cell.length > 0) return;
-        if (this.cells[row][col].isOpen()) return;
 
+        if (this.cells[row][col].isOpen()) return;
         if (this.cells[row][col].isFlag()){
             this.cells[row][col].removeFlag();
             cell.attr({

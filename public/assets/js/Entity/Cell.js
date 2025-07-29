@@ -2,10 +2,11 @@ export default class Cell{
     constructor({
         col,
         row,
+        ui,
     } = {}){
-        // TODO: this.ui ?
         this.col = col;
         this.row = row;
+        this.ui = ui;
         this.flag = false;
         this.opened = false;
         this.number = null;

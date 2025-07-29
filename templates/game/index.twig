@@ -24,7 +24,7 @@
         game.start({
             cols : $('[name="cols"]').val(),
             rows : $('[name="rows"]').val(),
-            seed : $('[name="seed"]').val(),
+            seed : $('[name="seed"]').val() ?? getRandomInt(1000000),
             difficult : $('[name="difficult"]').val()
         });
     });
@@ -32,5 +32,10 @@
     $("#randomSeed").click(() => {
         $('[name="seed"]').val(getRandomInt(1000000));
     });
+
+    let test = setInterval(() => {
+        $("#startGame").click()
+        clearInterval(test);
+    }, 500);
 </script>
 {% endblock  %}

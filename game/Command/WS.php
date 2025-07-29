@@ -12,6 +12,7 @@ use Game\MineSweeper\Interfaces\ServerInterface;
 use Game\MineSweeper\Live;
 use Game\MineSweeper\Player;
 use Game\MineSweeper\Server;
+use Game\MineSweeper\WSGame;
 use Game\Service\Util\JsonUtil;
 
 use Workerman\Connection\TcpConnection;
@@ -48,17 +49,20 @@ class WSStorage
 $ws->count = Server::MAX_GAMES * Game::MAX_PLAYERS;
 
 // Emitted when new connection come
-$ws->onConnect = function ($conn){
-    /**
-     * @var TcpConnection $conn
-     */
-    $conn->send(JsonUtil::stringify([
-        "type" => "info",
-        "msg" => "Connection success",
-    ]));
-};
+$ws->onConnect = [WSGame::class, "addClient"];
+// $ws->onConnect = function ($conn){
+//     WSGame::addClient($conn);
+//     /**
+//      * @var TcpConnection $conn
+//      */
+//     $conn->send(JsonUtil::stringify([
+//         "type" => "info",
+//         "msg" => "Connection success",
+//     ]));
+// };
 
 // Emitted when data received
+$ws->onConnect = [WSGame::class, "onMessage"];
 $ws->onMessage = function ($conn, $json) {
     /**
      * @var TcpConnection $conn
@@ -133,6 +137,7 @@ $ws->onMessage = function ($conn, $json) {
 };
 
 // Emitted when connection closed
+$ws->onClose = [WSGame::class, "removeClient"];
 $ws->onClose = function ($conn) {
     /**
      * @var TcpConnection $conn

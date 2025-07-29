@@ -9,7 +9,7 @@ use Game\Exception\PlayerDieException;
 
 class Game implements Interfaces\GameInterface
 {
-    use Traits\GetIdTrait;
+    use Traits\IdTrait;
 
     public const TYPE_MP = "MP";
     public const TYPE_SP = "SP";
