@@ -7,7 +7,9 @@ use Game\MineSweeper\CellType\Number;
 use Game\MineSweeper\Difficult;
 use Game\MineSweeper\Field;
 use Game\MineSweeper\Game;
+use Game\MineSweeper\Live;
 use Game\MineSweeper\Player;
+use Game\MineSweeper\Server;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -30,59 +32,75 @@ class Start extends Command
                 'x',    // Алиас (короткая форма)
                 InputOption::VALUE_REQUIRED, // Тип значения
                 'Количество строк', // Описание
-                10      // Значение по умолчанию
+                20      // Значение по умолчанию
             )
             ->addOption(
                 'cols',
                 'y',
                 InputOption::VALUE_REQUIRED,
                 'Количество столбцов',
-                10
+                40
             )
             ->addOption(
                 'seed',
                 's',
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_OPTIONAL,
                 'Сид для генерации',
                 null
             )
             ->addOption(
-                'difficult',
-                'd',
+                'bombs',
+                'b',
                 InputOption::VALUE_REQUIRED,
-                'Сложность [easy, medium, hard]',
-                "easy"
+                'Колличество бомб',
+                32
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $x = (int) $input->getOption('rows');
-        $y = (int) $input->getOption('cols');
-        $seed = (int) $input->getOption('seed');
-        $difficultName = (string) $input->getOption('difficult');
-        dump([$x,$y,$seed, $difficultName]);
-        $game = new Game(
-            new Player(),
-            new Field($x,$y, $seed)
+        $cols = (int) $input->getOption('cols');
+        $rows = (int) $input->getOption('rows');
+        $bombs= (int) $input->getOption('bombs');
+        $seed = $input->getOption('seed');
+        
+        dump([$cols, $rows, $bombs, $seed]);
+        
+        /**
+         * @var \Game\MineSweeper\Interfaces\ServerInterface
+         */
+        $server = new Server();
+
+        /**
+         * @var \Game\MineSweeper\Interfaces\GameInterface $game
+         * @var \Game\MineSweeper\Interfaces\FieldInterface $filed
+         */
+        $game = new Game(Game::TYPE_SP, $filed = new Field(
+            $cols,
+            $rows,
+            $bombs,
+            $seed
+        ));
+
+        $game->addPlayer(
+            new Player(
+                "session_id",
+                new Live(1)
+            )
         );
 
-        if (in_array($difficultName, ["easy", "medium", "hard"])){
-            if (method_exists(Difficult::class, $difficultName)){
-                $difficult = Difficult::$difficultName();
-            }else{
-                $difficult = Difficult::easy();
-            }
-        }
-        $game->setDifficult($difficult);
-        $game->buildField();
+        $server->addGame($game);
 
-        // Вывод
-        for ($y = 0; $y < $game->field()->getY(); $y++) {
-            for ($x = 0; $x < $game->field()->getX(); $x++) {
-                /** @var Bomb|Number $cell */
-                $cell = $game->field()->getCell($x,$y);
-                echo $cell->isBomb() ? " x " : " " . ($cell->getBombNear() === 0 ? " " : $cell->getBombNear()) . " ";
+        // dump($server);
+        for ($r = 0; $r < $filed->getRows(); $r++) {
+            for ($c = 0; $c < $filed->getCols(); $c++) {
+                $cell = $filed->getCell($c, $r);
+                if ($cell->isBomb()) {
+                    echo " x ";  
+                } else {
+                    $n = $cell->getNumber() === 10 ? " " : $cell->getNumber();
+                    echo " {$n} ";
+                }
             }
             echo PHP_EOL;
         }

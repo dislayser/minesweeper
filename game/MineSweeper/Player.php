@@ -1,51 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Game\MineSweeper;
 
 use Game\Exception\GameException;
 use Game\Exception\PlayerDieException;
+use Game\MineSweeper\Interfaces\LiveInterface;
 
 
-class Player
+class Player implements Interfaces\PlayerInterface
 {
-    private bool $die = false;
+    use Traits\GetIdTrait;
+
     private bool $win = false;
 
     public function __construct(
-        private ?string $playerId = null
-    ) {
-        if (!$this->playerId){
-            if (session_status() === PHP_SESSION_NONE) session_start();
-            $this->playerId = session_id();
-        }
+        private string $id,
+        private LiveInterface $live
+    ) {}
+
+    public function getLive(): LiveInterface
+    {
+        return $this->live;
     }
 
-    public function getPlayerId() : string
+    /**
+     * @throws \Game\Exception\PlayerDieException Если игрок проиграл
+     */
+    public function win(): static
     {
-        return $this->playerId;
-    }
-
-    public function win() : bool
-    {
-        if ($this->die) throw new PlayerDieException("Этот игрок проиграл.");
+        if ($this->isDie()) throw new PlayerDieException("Этот игрок проиграл.");
+        
         $this->win = true;
-        return true;
+        
+        return $this;
     }
 
-    public function die() : bool
+    /**
+     * Вызывать метод при взрыве
+     * @throws \Game\Exception\GameException Если игрок выиграл
+     */
+    public function die(): static
     {
-        if ($this->win) throw new GameException("Этот игрок выиграл.");
-        $this->die = true;
-        return true;
+        if ($this->isWin()) throw new GameException("Этот игрок выиграл.");
+        
+        $this->live->decrement();
+        
+        return $this;
     }
 
-    public function isWin() : bool
+    public function isWin(): bool
     {
         return $this->win;
     }
 
-    public function isDie() : bool
+    public function isDie(): bool
     {
-        return $this->die;
+        return $this->live->isDie();
     }
 }

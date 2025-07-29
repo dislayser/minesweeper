@@ -1,74 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Game\MineSweeper;
 
+use Game\Exception\GameException;
 use Game\MineSweeper\CellType\Bomb;
 use Game\MineSweeper\CellType\Number;
 
-class Game
+class Game implements Interfaces\GameInterface
 {
-    private Difficult $difficult;
+    use Traits\GetIdTrait;
+
+    public const TYPE_MP = "MP";
+    public const TYPE_SP = "SP";
+    public const MIN_PLAYERS = 1;
+    public const MAX_PLAYERS = 4;
+    
+    /**
+     * @var Interfaces\PlayerInterface[]
+     */
+    private array $players = [];
 
     public function __construct(
-        private Player $player,
-        private Field $field
+        private string $type,
+        private Interfaces\FieldInterface $field
     ) {}
 
-    public function setDifficult(Difficult $difficult) : void
+    public function getType(): string
     {
-        $this->difficult = $difficult;
-    } 
-
-    public function getDifficult() : Difficult
-    {
-        return $this->difficult;
+        return $this->type;
     }
 
-    public function buildField(): void
+    public function openCell(int $col, int $row): ?Interfaces\CellInterface
     {
-        // Постройка бомб
-        $this->field->setBombs((int)($this->field->getX() * $this->field->getY() / $this->difficult->getBombRatio()));
-
-        // Постройка числовых ячеек
-        for ($y = 0; $y < $this->field->getY(); $y++) {
-            for ($x = 0; $x < $this->field->getX(); $x++) {
-                $cell = $this->field->getCell($x,$y);
-                if ($cell instanceof Bomb) continue;
-                
-                $cell = new Number($x, $y);
-                
-                $cellsNear = $this->field()->getCellsNear($x, $y);
-                
-                $bombs = 0;
-                foreach ($cellsNear as $key => $value) {
-                    if ($value?->isBomb()) $bombs++;
-                }
-                $cell->setBombNear($bombs);
-
-                $this->field->setCell($cell);
-            }
-        }
-    }
-
-    public function openCell(int $x, int $y): ?Cell
-    {
-        $cell = $this->field->getCell($x, $y);
+        $cell = $this->field->getCell($col, $row);
         if ($cell && $cell->isBomb()) {
             $this->player->die();
         }
         return $cell;
     }
 
-
-    /**
-     * Summary of openCells
-     * @param array[array] $cells
-     * @return Cell[][]
-     */
-    public function openCells(array $cells): array 
+    public function openCells(array $range): array 
     {
         $cells = [];
-        foreach ($cells as $row => $cols) {
+        foreach ($range as $row => $cols) {
             foreach ($cols as $col => $click) {
                 if ($click === "click") {
                     $cells[] = $this->openCell($col, $row);
@@ -83,8 +59,33 @@ class Game
         return $this->field;
     }
 
-    public function player(): Player
+    public function addPlayer(Interfaces\PlayerInterface $player): static
     {
-        return $this->player;
+        if (!in_array($player, $this->players)) {
+            if (count($this->players) >= self::MAX_PLAYERS) {
+                throw new GameException("Больше ".self::MAX_PLAYERS." игроков в игре не может быть");
+            }
+            $this->players[] = $player;
+        }
+        return $this;
+    }
+
+    public function getPlayers(): array
+    {
+        if (count($this->players) < self::MIN_PLAYERS) {
+            throw new GameException("Меньше ".self::MIN_PLAYERS." игрока в игре не может быть");
+        }
+        return $this->players;
+    }
+
+    public function isRuning(): bool
+    {
+        $count = 0;
+        foreach ($this->players as $player) {
+            if ($player->isDie() || $player->isWin()) {
+                $count++;
+            }
+        }
+        return count($this->players) === $count;
     }
 }
