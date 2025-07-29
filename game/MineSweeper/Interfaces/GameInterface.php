@@ -22,7 +22,9 @@ interface GameInterface
     /**
      * @return CellInterface[]
      */
-    public function openCell(int $col,  int $row, PlayerInterface $player): array;
+    public function openCell(int $col, int $row, PlayerInterface $player): array;
+    
+    public function setFlag(int $col,  int $row, PlayerInterface $player): bool;
 
     /**
      * @return CellInterface[]

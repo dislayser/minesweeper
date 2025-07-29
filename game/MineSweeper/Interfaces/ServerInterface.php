@@ -24,5 +24,5 @@ interface ServerInterface
     
     public function setModerator(PlayerInterface $player): static;
 
-    public function doAction(ActionInterface $action): array;
+    public function doAction(ActionInterface $action): mixed;
 }

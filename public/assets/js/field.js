@@ -1,4 +1,4 @@
-class Field{
+export class Field{
     constructor($field = $("#gameField")){
         this.rows;
         this.cols;

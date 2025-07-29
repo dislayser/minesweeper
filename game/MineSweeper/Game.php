@@ -31,6 +31,21 @@ class Game implements Interfaces\GameInterface
         return $this->type;
     }
 
+    public function setFlag(int $col, int $row, Interfaces\PlayerInterface $player): bool
+    {
+        $cell = $this->field->getCell($col, $row);
+        try {
+            if ($cell === null) return false;
+            if ($cell->isOpen()) return false;
+
+            $cell->setFlag();
+            return true;
+        } catch (PlayerDieException $e) {
+            $player->die();
+        }
+        return false;
+    }
+
     public function openCell(int $col, int $row, Interfaces\PlayerInterface $player): array
     {
         $cell = $this->field->getCell($col, $row);
@@ -68,12 +83,16 @@ class Game implements Interfaces\GameInterface
     {
         $cells = [];
         foreach ($range as $colrow) {
-            $cell = $this->openCell(
+            $opened = $this->openCell(
                 $colrow[0],
                 $colrow[1],
                 $player
             );
-            if ($cell) $cells[] = $cell;
+            foreach ($opened as $cell) {
+                if (!in_array($cell, $cells)) {
+                    $cells[] = $cell;
+                }
+            }
 
             if ($player->isDie()) break;
         }

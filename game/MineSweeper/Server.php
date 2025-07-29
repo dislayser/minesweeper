@@ -65,21 +65,46 @@ class Server implements Interfaces\ServerInterface
     }
 
     // TODO: Тут нужен логгер - для логирования действий юзера
-    public function doAction(Interfaces\ActionInterface $action): array
+    public function doAction(Interfaces\ActionInterface $action): mixed
     {
-        if ($action->getType() === Action::TYPE_OPENCELL) {
-            foreach ($this->getPlayers() as $player) {
-                if ($player->getId() === $action->getPlayerId()) {
-                    return $this
-                        ->getGameByPlayer($player)
-                        ->openCell(
-                            $action->getCellData()["col"],
-                            $action->getCellData()["row"],
-                            $player
-                        );
-                }
+        $player = null;
+        foreach ($this->getPlayers() as $p) {
+            if ($p->getId() === $action->getPlayerId()) {
+                $player = $p;
             }
         }
-        return [];
+        
+        if ($player === null) return null;
+
+        if ($action->getType() === Action::TYPE_OPENCELL) {
+            return $this
+                ->getGameByPlayer($player)
+                ->openCell(
+                    $action->getCellData()["col"],
+                    $action->getCellData()["row"],
+                    $player
+                );
+        }
+
+        if ($action->getType() === Action::TYPE_SETFLAG) {
+            return $this
+                ->getGameByPlayer($player)
+                ->setFlag(
+                    $action->getCellData()["col"],
+                    $action->getCellData()["row"],
+                    $player
+                );
+        }
+
+        if ($action->getType() === Action::TYPE_OPENCELLS) {
+            return $this
+                ->getGameByPlayer($player)
+                ->openCells(
+                    $action->getCellsData(),
+                    $player
+                );
+        }
+        
+        return null;
     }
 }

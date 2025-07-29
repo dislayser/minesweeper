@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Game\Command;
 
 use Game\MineSweeper\Action;
@@ -27,13 +29,13 @@ class Start extends Command
     {
         $this
             ->setDescription('Старт игры')
-            ->setHelp('Эта команда показывает пример использования Symfony Console.')
+            ->setHelp('Эта комманда тестирует игру.')
             ->addOption(
-                'rows', // Имя опции
+                'rows',     // Имя опции
                 'x',    // Алиас (короткая форма)
                 InputOption::VALUE_REQUIRED, // Тип значения
                 'Количество строк', // Описание
-                10      // Значение по умолчанию
+                10       // Значение по умолчанию
             )
             ->addOption(
                 'cols',
@@ -60,10 +62,10 @@ class Start extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $cols = (int) $input->getOption('cols');
-        $rows = (int) $input->getOption('rows');
+        $cols = (int) $input->getOption('cols' );
+        $rows = (int) $input->getOption('rows' );
         $bombs= (int) $input->getOption('bombs');
-        $seed = $input->getOption('seed');
+        $seed =       $input->getOption('seed' );
         
         dump([$cols, $rows, $bombs, $seed]);
         
@@ -83,16 +85,14 @@ class Start extends Command
             $seed
         ));
 
-        $game->addPlayer(
-            $player = new Player(
-                $playerId = "session_id",
-                new Live(1)
-            )
-        );
+        $game->addPlayer($player = new Player(
+            $playerId = "session_id",
+            new Live(1)
+        ));
 
         $server->addGame($game);
 
-        // dump($server);
+        dump($server);
         for ($r = 0; $r < $filed->getRows(); $r++) {
             for ($c = 0; $c < $filed->getCols(); $c++) {
                 $cell = $filed->getCell($c, $r);
@@ -108,9 +108,12 @@ class Start extends Command
 
         dump($filed->getCell(0,0));
         dump($server->doAction(
-            new Action(Action::TYPE_OPENCELL, $playerId, [
-                "col" => 1,
-                "row" => 1
+            new Action(Action::TYPE_OPENCELLS, $playerId, [
+                [0,0],
+                [1,0],
+                [2,0],
+                [0,1],
+                [1,1],
             ])
         ));
         dump($player);
