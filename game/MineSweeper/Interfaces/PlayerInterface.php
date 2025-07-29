@@ -6,7 +6,7 @@ namespace Game\MineSweeper\Interfaces;
 
 interface PlayerInterface
 {
-    public function getId(): string;
+    public function getId(): int|string;
     
     public function getLive(): LiveInterface;
     

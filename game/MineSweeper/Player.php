@@ -6,8 +6,6 @@ namespace Game\MineSweeper;
 
 use Game\Exception\GameException;
 use Game\Exception\PlayerDieException;
-use Game\MineSweeper\Interfaces\LiveInterface;
-
 
 class Player implements Interfaces\PlayerInterface
 {
@@ -16,11 +14,13 @@ class Player implements Interfaces\PlayerInterface
     private bool $win = false;
 
     public function __construct(
-        private string $id,
-        private LiveInterface $live
-    ) {}
+        string $id,
+        private Interfaces\LiveInterface $live
+    ) {
+        $this->id = $id;
+    }
 
-    public function getLive(): LiveInterface
+    public function getLive(): Interfaces\LiveInterface
     {
         return $this->live;
     }

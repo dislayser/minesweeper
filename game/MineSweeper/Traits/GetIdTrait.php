@@ -6,9 +6,9 @@ namespace Game\MineSweeper\Traits;
 
 trait GetIdTrait
 {
-    private string $id;
+    private int|string $id;
 
-    public function getId(): string
+    public function getId(): int|string
     {
         return $this->id;
     }

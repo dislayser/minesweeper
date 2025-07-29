@@ -6,7 +6,7 @@ namespace Game\MineSweeper\Interfaces;
 
 interface GameInterface
 {
-    public function getId(): string;
+    public function getId(): int|string;
     /**
      * @return "MP"|"SP"
      */
@@ -19,12 +19,15 @@ interface GameInterface
     
     public function addPlayer(PlayerInterface $player): static;
     
-    public function openCell(int $col,  int $row): ?CellInterface;
+    /**
+     * @return CellInterface[]
+     */
+    public function openCell(int $col,  int $row, PlayerInterface $player): array;
 
     /**
      * @return CellInterface[]
      */
-    public function openCells(array $range): array;
+    public function openCells(array $range, PlayerInterface $player): array;
 
     public function isRuning(): bool;
 }

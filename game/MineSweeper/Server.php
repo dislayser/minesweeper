@@ -63,4 +63,23 @@ class Server implements Interfaces\ServerInterface
         $this->moderator = $player;
         return $this;
     }
+
+    // TODO: Тут нужен логгер - для логирования действий юзера
+    public function doAction(Interfaces\ActionInterface $action): array
+    {
+        if ($action->getType() === Action::TYPE_OPENCELL) {
+            foreach ($this->getPlayers() as $player) {
+                if ($player->getId() === $action->getPlayerId()) {
+                    return $this
+                        ->getGameByPlayer($player)
+                        ->openCell(
+                            $action->getCellData()["col"],
+                            $action->getCellData()["row"],
+                            $player
+                        );
+                }
+            }
+        }
+        return [];
+    }
 }

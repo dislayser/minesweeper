@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Game\MineSweeper;
 
 use Game\Exception\GameException;
-use Game\MineSweeper\CellType\Bomb;
-use Game\MineSweeper\CellType\Number;
+use Game\Exception\PlayerDieException;
 
 class Game implements Interfaces\GameInterface
 {
@@ -32,31 +31,53 @@ class Game implements Interfaces\GameInterface
         return $this->type;
     }
 
-    public function openCell(int $col, int $row): ?Interfaces\CellInterface
+    public function openCell(int $col, int $row, Interfaces\PlayerInterface $player): array
     {
         $cell = $this->field->getCell($col, $row);
-        if ($cell && $cell->isBomb()) {
-            $this->player->die();
-        }
-        return $cell;
-    }
-
-    public function openCells(array $range): array 
-    {
         $cells = [];
-        foreach ($range as $row => $cols) {
-            foreach ($cols as $col => $click) {
-                if ($click === "click") {
-                    $cells[] = $this->openCell($col, $row);
+        try {
+            if ($cell === null) return $cells;
+            if ($cell->isOpen()) return $cells;
+
+            $cell->open();
+            $cells[] = $cell;
+
+            if (!$cell->isBomb() && $cell->getNumber() === 0) {
+                $near = $this->field->getCellsNear($col, $row);
+                foreach ($near as $nearCell) {
+                    if ($nearCell === null) continue;
+                    $opened = $this->openCell($nearCell->getCol(), $nearCell->getRow(), $player);
+                    foreach ($opened as $openedCell) {
+                        if (!in_array($openedCell, $cells)) {
+                            $cells[] = $openedCell;
+                        }
+                    }
                 }
             }
+        } catch (PlayerDieException $e) {
+            $player->die();
         }
+        
         return $cells;
     }
 
-    public function field(): Field
+    /**
+     * @return array<Interfaces\CellInterface>
+     */
+    public function openCells(array $range, Interfaces\PlayerInterface $player): array 
     {
-        return $this->field;
+        $cells = [];
+        foreach ($range as $colrow) {
+            $cell = $this->openCell(
+                $colrow[0],
+                $colrow[1],
+                $player
+            );
+            if ($cell) $cells[] = $cell;
+
+            if ($player->isDie()) break;
+        }
+        return $cells;
     }
 
     public function addPlayer(Interfaces\PlayerInterface $player): static

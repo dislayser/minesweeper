@@ -1,15 +1,10 @@
 <?php
 
-// TODO: допустил ошибку в словах exception ))) - надо будет поправить
-
 declare(strict_types=1);
 
 namespace Game\Exception;
 
-use Exception;
-use Throwable;
-
-class GameException extends Exception
+class GameException extends \Exception
 {
     protected $context = [];
 
@@ -17,7 +12,7 @@ class GameException extends Exception
         string $message = "",
         int $code = 0,
         array $context = [],
-        ?Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct($message, $code, $previous);
         $this->context = $context;

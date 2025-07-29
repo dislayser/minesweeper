@@ -2,6 +2,7 @@
 
 namespace Game\Command;
 
+use Game\MineSweeper\Action;
 use Game\MineSweeper\CellType\Bomb;
 use Game\MineSweeper\CellType\Number;
 use Game\MineSweeper\Difficult;
@@ -32,14 +33,14 @@ class Start extends Command
                 'x',    // Алиас (короткая форма)
                 InputOption::VALUE_REQUIRED, // Тип значения
                 'Количество строк', // Описание
-                20      // Значение по умолчанию
+                10      // Значение по умолчанию
             )
             ->addOption(
                 'cols',
                 'y',
                 InputOption::VALUE_REQUIRED,
                 'Количество столбцов',
-                40
+                10
             )
             ->addOption(
                 'seed',
@@ -53,7 +54,7 @@ class Start extends Command
                 'b',
                 InputOption::VALUE_REQUIRED,
                 'Колличество бомб',
-                32
+                20
             );
     }
 
@@ -83,8 +84,8 @@ class Start extends Command
         ));
 
         $game->addPlayer(
-            new Player(
-                "session_id",
+            $player = new Player(
+                $playerId = "session_id",
                 new Live(1)
             )
         );
@@ -104,6 +105,15 @@ class Start extends Command
             }
             echo PHP_EOL;
         }
+
+        dump($filed->getCell(0,0));
+        dump($server->doAction(
+            new Action(Action::TYPE_OPENCELL, $playerId, [
+                "col" => 1,
+                "row" => 1
+            ])
+        ));
+        dump($player);
 
         return Command::SUCCESS;
     }

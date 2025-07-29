@@ -20,4 +20,10 @@ interface FieldInterface
      * @return CellInterface[]
      */
     public function getCells(array $range): array;
+    
+    /**
+     * @return CellInterface[]
+     */
+    public function getCellsNear(int $col, int $row): array;
+    
 } 

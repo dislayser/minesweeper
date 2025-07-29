@@ -76,24 +76,13 @@ class Field implements Interfaces\FieldInterface
 
     public function getBombsNear(int $col, int $row): int
     {
-        $near = [
-            $this->getCell($col - 1, $row + 1),
-            $this->getCell($col,     $row + 1),
-            $this->getCell($col + 1, $row + 1),
-            $this->getCell($col - 1, $row),
-            $this->getCell($col + 1, $row),
-            $this->getCell($col - 1, $row - 1),
-            $this->getCell($col,     $row - 1),
-            $this->getCell($col + 1, $row - 1),
-        ];
-
+        $near = $this->getCellsNear($col, $row);
         $bombs = 0;
         foreach ($near as $cell) {
             if ($cell && $cell->isBomb()) {
                 $bombs++;  
             }
         }
-
         return $bombs;
     }
 
@@ -142,6 +131,21 @@ class Field implements Interfaces\FieldInterface
             return $this->cells[$row][$col];
         }
         return null;
+    }
+
+    public function getCellsNear(int $col, int $row): array
+    {
+        $near = [
+            $this->getCell($col - 1, $row + 1),
+            $this->getCell($col,     $row + 1),
+            $this->getCell($col + 1, $row + 1),
+            $this->getCell($col - 1, $row    ),
+            $this->getCell($col + 1, $row    ),
+            $this->getCell($col - 1, $row - 1),
+            $this->getCell($col,     $row - 1),
+            $this->getCell($col + 1, $row - 1),
+        ];
+        return $near;
     }
 
     private function setBombs(int $bombs): void

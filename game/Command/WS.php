@@ -7,6 +7,7 @@ use Game\MineSweeper\Difficult;
 use Game\MineSweeper\Field;
 use Game\MineSweeper\Game;
 use Game\MineSweeper\Player;
+use Game\MineSweeper\Server;
 use Game\Service\Util\JsonUtil;
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
@@ -23,7 +24,7 @@ class ClientStorage {
 }
 
 // Задаем количество процессов
-$ws->count = 8;
+$ws->count = Server::MAX_GAMES * Game::MAX_PLAYERS;
 
 // Emitted when new connection come
 $ws->onConnect = function ($conn){
@@ -36,7 +37,7 @@ $ws->onConnect = function ($conn){
 };
 
 // Emitted when data received
-$ws->onMessage = function ($conn, $data) {
+$ws->onMessage = function (TcpConnection $conn, $data) {
     if (!isset(ClientStorage::$clients[$conn->id])) return;
 
     // Проверка выигрыша
