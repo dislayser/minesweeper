@@ -1,0 +1,20 @@
+{% block leftMenu %}
+<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#serverList" aria-controls="serverList">
+    Серверы
+</button>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="serverList" aria-labelledby="serverListLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="serverListLabel">Список серверов</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="d-flex flex-column gap-3 mb-3" id="list">
+            
+        </div>
+        <button type="button" class="btn btn-outline-success w-100" id="newServer">
+            <i class="bi-plus"></i> Создать сервер
+        </button>
+    </div>
+</div>
+{% endblock %}

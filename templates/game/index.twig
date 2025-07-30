@@ -1,13 +1,17 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-    {% include("game/config.twig") %}
+    <main class="container my-3">
+        {% include("parts/config.twig") %}
+        {% include("parts/sidebar.html.twig") %}
+    </main>
     <div class="mx-auto">
         <div class="d-flex flex-column user-select-none" id="gameField"></div>
     </div>
 {% endblock %}
 
 {% block js_render %}
+<script type="module" src="/assets/js/index.js"></script>
 <script type="module">
     import { Game } from "/assets/js/game.js";
 

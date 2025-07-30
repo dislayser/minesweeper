@@ -62,7 +62,7 @@ $ws->onConnect = [WSGame::class, "addClient"];
 // };
 
 // Emitted when data received
-$ws->onConnect = [WSGame::class, "onMessage"];
+$ws->onMessage = [WSGame::class, "onMessage"];
 $ws->onMessage = function ($conn, $json) {
     /**
      * @var TcpConnection $conn

@@ -1,5 +1,6 @@
 import Cell from "./Entity/Cell.js";
 import { Field } from "./field.js";
+import { WSPlugin } from "./WS/plugin.js";
 
 export class Game{
     constructor({
@@ -11,30 +12,24 @@ export class Game{
         this.cells = [];
         
         this.type = {
-            CREATE : "create",
-            OPEN_CELL : "OPENCELL",
-            OPEN_CELLS : "OPENCELLS",
-            SET_FLAG : "SETFLAG",
+            CREATE      : "create",
+            CREATEGAME  : "create_game",
+            CREATESERVER: "create_server",
+            OPEN_CELL   : "OPENCELL",
+            OPEN_CELLS  : "OPENCELLS",
+            SET_FLAG    : "SETFLAG",
         };
 
         try {
-            this.ws = new WebSocket('ws://localhost:8080');  
-            this.ws.onopen = () => {
-                this.ws.send(JSON.stringify({
-                    "token" : $('input[name="_csrf"]').val() ?? "some CSRF token"
-                }));
-            };
-            this.ws.onmessage = (event) => {
-                console.log(event.data);
-                const json = JSON.parse(event.data);
-                console.log(json);
-
+            WSPlugin.on("onopen", () => {
+                WSPlugin.send({"token" : $('input[name="_csrf"]').val() ?? "some CSRF token"});
+            });
+            WSPlugin.on("onmessage", (json) => {
                 if (json.type && json.type == this.type.CREATE){
                     this.createField(json);
                 }
                 if (json.type && json.type == this.type.OPEN_CELL){
                     for (let i = 0; i < json.data.length; i++) {
-                        console.log(json.data[i]);
                         this.openCell(
                             json.data[i].col,
                             json.data[i].row,
@@ -43,14 +38,11 @@ export class Game{
                         );
                     }
                 }
-            };
-            this.ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
-            this.ws.onclose = () => {
+            });
+            WSPlugin.on("onclose", () => {
                 console.log('Disconnected from the server');
-            };
-            
+            });
+            WSPlugin.on("onerror", console.error);
         } catch (err) {
             console.warn(err);
         }
@@ -191,6 +183,6 @@ export class Game{
     }
 
     doAction(data) {
-        if (this.ws) this.ws.send(JSON.stringify(data));
+        WSPlugin.send(data);
     }
 }
