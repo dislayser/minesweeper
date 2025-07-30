@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Game\MineSweeper\CellType;
 
-use Game\MineSweeper\Cell;
+use Game\MineSweeper\AbstractCell;
 
-class Bomb extends Cell
+class CellBomb extends AbstractCell
 {
     public function isBomb(): bool
     {

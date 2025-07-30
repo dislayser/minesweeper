@@ -1,125 +1,148 @@
 <?php
-// TODO: WS нужно переписать
+
+declare(strict_types=1);
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use Game\MineSweeper\CellType\Number;
+use Game\MineSweeper\Action;
 use Game\MineSweeper\Difficult;
 use Game\MineSweeper\Field;
 use Game\MineSweeper\Game;
+use Game\MineSweeper\Interfaces\ServerInterface;
+use Game\MineSweeper\Live;
 use Game\MineSweeper\Player;
+use Game\MineSweeper\Server;
+use Game\MineSweeper\WSGame;
 use Game\Service\Util\JsonUtil;
+
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 
 // Create a Websocket server
 $ws = new Worker('websocket://0.0.0.0:8080');
 
-// Глобальное хранилище клиентов
-class ClientStorage {
-    /**
-     * @var Game[] $clients 
-     */
-    public static $clients = [];
+/**
+ * Global storage
+ */
+class WSStorage
+{
+    private static $servers = [];
+
+    public static function getActual(): ?ServerInterface
+    {
+        if (count(self::$servers) === 0) {
+            return null;
+        }
+        return end(self::$servers)["server"];
+    }
+
+    public static function add(ServerInterface $server): void
+    {
+        self::$servers[] = [
+            "time" => new \DateTime(),
+            "server" => $server,
+        ];
+    }
 }
 
 // Задаем количество процессов
-$ws->count = 8;
+$ws->count = Server::MAX_GAMES * Game::MAX_PLAYERS;
 
 // Emitted when new connection come
-$ws->onConnect = function ($conn){
-    if (isset(ClientStorage::$clients[$conn->id])) return;
-
-    ClientStorage::$clients[$conn->id] = new Game(
-        new Player(),
-        new Field(10, 10)
-    );
-};
+$ws->onConnect = [WSGame::class, "addClient"];
+// $ws->onConnect = function ($conn){
+//     WSGame::addClient($conn);
+//     /**
+//      * @var TcpConnection $conn
+//      */
+//     $conn->send(JsonUtil::stringify([
+//         "type" => "info",
+//         "msg" => "Connection success",
+//     ]));
+// };
 
 // Emitted when data received
-$ws->onMessage = function ($conn, $data) {
-    if (!isset(ClientStorage::$clients[$conn->id])) return;
-
-    // Проверка выигрыша
-    if (ClientStorage::$clients[$conn->id]->player()->isWin()) {
-        $conn->send(JsonUtil::stringify([
-            "type" => "win"
-        ]));
-        return;
-    }
-
-    // Проверка проигрыша
-    if (ClientStorage::$clients[$conn->id]->player()->isDie()) {
-        $conn->send(JsonUtil::stringify([
-            "type" => "die"
-        ]));
-        return;
-    }
-
-    // Обработка сообщений
-    $data = JsonUtil::parse($data);
+$ws->onConnect = [WSGame::class, "onMessage"];
+$ws->onMessage = function ($conn, $json) {
+    /**
+     * @var TcpConnection $conn
+     * @var string $json
+     * @var array $data
+     */
+    $data = JsonUtil::parse($json);
     if (!isset($data["type"])) return;
 
-    if ($data["type"] === "open") {
-        $open = ClientStorage::$clients[$conn->id]->openCell(
-            (int) $data["x"],
-            (int) $data["y"]
-        );
-
-        if ($open) {
-            $conn->send(JsonUtil::stringify([
-                "type" => "cell",
-                "x" => $open->getX(),
-                "y" => $open->getY(),
-                "isBomb" => $open->isBomb(),
-                "number" => ($open instanceof Number ? $open->getBombNear() : null),
-            ]));
-        }
-    }
+    $server = WSStorage::getActual();
 
     if ($data["type"] === "create") {
-        if (isset($data["cols"], $data["rows"], $data["seed"], $data["difficult"])) {
-            dump($data);
-            $rows = (int) $data["rows"];
-            $cols = (int) $data["cols"];
-            $seed = (int) $data["seed"];
-            $difficult = (string) $data["difficult"];
-
-            // Validation
-            if ($rows < 2 || $cols < 2 || empty($seed) || !method_exists(Difficult::class, $difficult)) return;
-
-            $client = &ClientStorage::$clients[$conn->id];
-
-            // Создание нового клиента
-            $client = new Game(
-                new Player($conn->id),
-                new Field($cols, $rows, $seed)
+        
+        if (!$server) {
+            $diff = [
+                "easy" => 10,
+                "medium" => 7,
+                "hard" => 4,
+            ];
+            $server = new Server();
+            $game = new Game(
+                Game::TYPE_SP,
+                new Field(
+                    $rows = (int) $data["rows"],
+                    $cols = (int) $data["cols"],
+                    (int) ($rows * $cols / $diff[$data["difficult"]]),
+                    $seed = (int) $data["seed"],
+                )
             );
-            
-            // Установка сложности
-            $client->setDifficult(Difficult::$difficult());
-
-            // Постройка игры
-            $client->buildField();
-            
+            $game->addPlayer(new Player($conn->id, new Live()));
+            $server->addGame($game);
+            $server->setModerator($player = new Player($conn->id, new Live()));
+            WSStorage::add($server);
+        
             // Отправка клиенту
             $conn->send(JsonUtil::stringify([
                 "type" => "create",
-                "cols" => $client->field()->getX(),
-                "rows" => $client->field()->getY(),
-                "seed" => $client->field()->getSeed(),
+                "cols" => $cols,
+                "rows" => $rows,
+                "seed" => $seed,
             ]));
         }
+    }
+
+    if ($data["type"] === Action::TYPE_OPENCELL) {
+        /**
+         * @var \Game\MineSweeper\Interfaces\CellInterface[] $opened
+         */
+        $opened = $server->doAction(new Action(
+            $data["type"],
+            $conn->id,
+            ["col" => $data["col"], "row" => $data["row"]]
+        ));
+
+        $send = [];
+        foreach ($opened as $open) {
+            $send[] = [
+                "col" => $open->getCol(),
+                "row" => $open->getRow(),
+                "isBomb" => $open->isBomb(),
+                "number" => $open->getNumber(),
+            ];
+        }
+
+        $conn->send(JsonUtil::stringify([
+            "type" => $data["type"],
+            "data" => $send
+        ]));
     }
 
     return;
 };
 
 // Emitted when connection closed
+$ws->onClose = [WSGame::class, "removeClient"];
 $ws->onClose = function ($conn) {
-    if (isset(ClientStorage::$clients[$conn->id])) {
-        unset(ClientStorage::$clients[$conn->id]);
-    }
-    echo "Connection closed\n";
+    /**
+     * @var TcpConnection $conn
+     */
+    echo "Connection closed :: ID:{$conn->id}\n";
 };
 
 // Run worker

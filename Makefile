@@ -24,5 +24,8 @@ docker-pull:
 composer-update:
 	docker compose run --rm game-php composer update
 
+command-game-start:
+	docker compose run --rm game-php php bin/console game:start
+
 ws-restart:
 	docker-compose restart game-websocket

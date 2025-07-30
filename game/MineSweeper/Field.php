@@ -1,122 +1,166 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Game\MineSweeper;
 
-use Game\MineSweeper\CellType\Bomb;
-use Game\MineSweeper\CellType\Number;
+use Game\MineSweeper\CellType\CellBomb;
+use Game\MineSweeper\CellType\CellNumber;
+use Game\MineSweeper\Interfaces\CellInterface;
 
-/**
- * -1   :: Bomb
- * 0-8  :: Number cell
- */
-class Field
+class Field implements Interfaces\FieldInterface
 {
-    public const MAX_X = 200;
-    public const MAX_Y = 200;
-    public const MIN_X = 1;
-    public const MIN_Y = 1;
-    /** @var array[Cell[]] $cells */
+    public const MAX_COL = 199;
+    public const MAX_ROW = 199;
+    public const MIN_COL = 0;
+    public const MIN_ROW = 0;
+
+    /**
+     * @var array<array<Interfaces\CellInterface>> $cells
+     */
     private array $cells = [];
-    private int $seed;
+    private int $cols;
+    private int $rows;
     private int $bombs;
+    private ?int $seed;
 
     public function __construct(
-        private int $x,
-        private int $y,
-        ?int $seed = null
+        int $cols,
+        int $rows,
+        int $boms,
+        ?int $seed = null,
     ) {
-        $this->x = min(max($this->x, self::MIN_X), self::MAX_X);
-        $this->y = min(max($this->y, self::MIN_Y), self::MAX_Y);
-        // TODO: С веб сокета генерирует один и тот же сид
-        if (!$seed) $seed = rand(1, 2e9);
-        $this->seed = $seed;
+        $this->cols = min(max($cols, self::MIN_COL), self::MAX_COL);
+        $this->rows = min(max($rows, self::MIN_ROW), self::MAX_ROW);
+        $this->setBombs($boms);
+        $this->seed = (int) $seed; // $seed = rand(1, PHP_INT_MAX);
+
+        $this->init();
     }
 
-    public function getSeed() : int
+    private function init() : void
     {
-        return $this->seed;
-    }
-
-    public function getX() : int
-    {
-        return $this->x;
-    }
-
-    public function getY() : int
-    {
-        return $this->y;
-    }
-
-    public function setCell(?Cell $cell): bool
-    {
-        if (!$cell) return false;
-        $this->cells[$cell->getY()][$cell->getX()] = $cell;
-        return true;
-    }
-
-    public function getCell(int $x, int $y): ?Cell
-    {
-        if (isset($this->cells[$y], $this->cells[$y][$x])){
-            return $this->cells[$y][$x];
-        }else{
-            return null;
-        }
-    }
-
-    /** @return (Cell|null)[] */
-    public function getCellsNear(int $x, int $y): ?array
-    {
-        return [
-            $this->getCell($x-1, $y-1),
-            $this->getCell($x,   $y-1),
-            $this->getCell($x+1, $y-1),
-            $this->getCell($x-1, $y),
-            // $this->getCell($x, $y),
-            $this->getCell($x+1, $y),
-            $this->getCell($x-1, $y+1),
-            $this->getCell($x,   $y+1),
-            $this->getCell($x+1, $y+1),
-        ];
-    }
-
-    public function setBombs(int $bombs): void
-    {
-        $this->bombs = min($bombs, $this->getX() * $this->getY());
+        // Установка сида
         mt_srand($this->seed);
+        
         // Список всех возможных позиций
         $positions = [];
-        for ($r = 0; $r < $this->getY(); $r++) {
-            for ($c = 0; $c < $this->getX(); $c++) {
+        for ($r = 0; $r < $this->getRows(); $r++) {
+            for ($c = 0; $c < $this->getCols(); $c++) {
                 $positions[] = [$c, $r];
             }
         }
+
         // Перемешиваем позиции
         shuffle($positions);
 
         // Установка бомб
         for ($i = 0; $i < $this->bombs; $i++){
             [$x, $y] = $positions[$i];
-            $this->setCell(new Bomb($x, $y));
+            $this->setCell(new CellBomb($x, $y));
         }
         
+        // Сброс сида
         mt_srand(0);
+
+        // Заполнение остальных ячеек
+        for ($r = 0; $r < $this->getRows(); $r++) {
+            for ($c = 0; $c < $this->getCols(); $c++) {
+                if (!$this->hasCell($c, $r)) {
+                    $new = new CellNumber($c, $r, $this->getBombsNear($c, $r));
+                    $this->setCell($new);
+                }
+            }
+        }
     }
 
-    public function getCells() : array
+    public function getBombsNear(int $col, int $row): int
+    {
+        $near = $this->getCellsNear($col, $row);
+        $bombs = 0;
+        foreach ($near as $cell) {
+            if ($cell && $cell->isBomb()) {
+                $bombs++;  
+            }
+        }
+        return $bombs;
+    }
+
+
+    public function getSeed() : int
+    {
+        return $this->seed;
+    }
+
+    public function getCols() : int
+    {
+        return $this->cols;
+    }
+
+    public function getRows() : int
+    {
+        return $this->rows;
+    }
+
+    public function setCell(CellInterface $cell): bool
+    {
+        $col = $cell->getCol();
+        $row = $cell->getRow();
+
+        if (
+            self::MIN_COL <= $col && $col <= self::MAX_COL &&
+            self::MIN_ROW <= $row && $row <= self::MAX_ROW
+        ) {
+            $this->cells[$row][$col] = $cell;
+            return true;
+        }
+        return false;
+    }
+
+    public function hasCell(int $col, int $row): bool
+    {
+        return isset(
+            $this->cells[$row],
+            $this->cells[$row][$col]
+        );
+    }
+
+    public function getCell(int $col, int $row): ?Interfaces\CellInterface
+    {
+        if ($this->hasCell($col, $row)) {
+            return $this->cells[$row][$col];
+        }
+        return null;
+    }
+
+    public function getCellsNear(int $col, int $row): array
+    {
+        $near = [
+            $this->getCell($col - 1, $row + 1),
+            $this->getCell($col,     $row + 1),
+            $this->getCell($col + 1, $row + 1),
+            $this->getCell($col - 1, $row    ),
+            $this->getCell($col + 1, $row    ),
+            $this->getCell($col - 1, $row - 1),
+            $this->getCell($col,     $row - 1),
+            $this->getCell($col + 1, $row - 1),
+        ];
+        return $near;
+    }
+
+    private function setBombs(int $bombs): void
+    {
+        $this->bombs = max(0, min(
+            $this->getCols() * $this->getRows(),
+            $bombs,
+        ));
+    }
+
+    /**
+     * @return array<array<Interfaces\CellInterface>>
+     */
+    public function getCells(array $range) : array
     {
         return $this->cells;
-    }
-
-    /** @return array[Cell[]] */
-    public function openField(int $x, int $y) : array
-    {
-        $cells = []; 
-        /** @var Bomb|Number|null $open */
-        $open = $this->getCell($x,$y);
-        $cells[$y][$x] = $open;
-        if ($open?->isBomb() || $open?->getBombNear() > 0){
-            return $cells;
-        }
-        return $cells;
     }
 }

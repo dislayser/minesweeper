@@ -3,6 +3,7 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use Game\Kernel;
 use Symfony\Component\Console\Application;
 use Game\Command;
 
@@ -13,6 +14,7 @@ $application = new Application();
 $application->add(new Command\Start());
 $application->add(new Command\Test());
 $application->add(new Command\DbTest());
+$application->add(new Command\Reflect());
 
 // Запускаем приложение
 $application->run();

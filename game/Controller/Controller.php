@@ -27,7 +27,7 @@ class Controller implements ControllerInterface
         $loader = new FilesystemLoader(__DIR__."/../../templates");
         $twig = new Environment($loader, [
             'debug' => true,
-            'cache' => __DIR__."/../../cache/twig",
+            'cache' => sys_get_temp_dir()."/cache/twig",
         ]);
         $render = $twig->render($name, $data);
         echo $render;

@@ -8,9 +8,9 @@
 {% endblock %}
 
 {% block js_render %}
-<script src="/assets/js/field.js"></script>
-<script src="/assets/js/game.js"></script>
-<script>
+<script type="module">
+    import { Game } from "/assets/js/game.js";
+
     function getRandomInt(max) {
         return Math.floor(Math.random() * max);
     }
@@ -24,7 +24,7 @@
         game.start({
             cols : $('[name="cols"]').val(),
             rows : $('[name="rows"]').val(),
-            seed : $('[name="seed"]').val(),
+            seed : $('[name="seed"]').val() ?? getRandomInt(1000000),
             difficult : $('[name="difficult"]').val()
         });
     });
@@ -32,5 +32,10 @@
     $("#randomSeed").click(() => {
         $('[name="seed"]').val(getRandomInt(1000000));
     });
+
+    let test = setInterval(() => {
+        $("#startGame").click()
+        clearInterval(test);
+    }, 500);
 </script>
 {% endblock  %}

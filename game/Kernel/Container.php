@@ -9,16 +9,16 @@ use Psr\Container\ContainerInterface;
 
 class Container implements ContainerInterface
 {
-    /** @var array<int|string, callable|object> */
+    /** @var array<string, callable|object> */
     protected array $services = [];
 
     /**
      * Проверяет, существует ли сервис с указанным идентификатором.
      *
-     * @param int|string $id
+     * @param string $id
      * @return bool
      */
-    public function has(int|string $id): bool
+    public function has(string $id): bool
     {
         return isset($this->services[$id]);
     }
@@ -26,10 +26,10 @@ class Container implements ContainerInterface
     /**
      * Регистрирует сервис в контейнере.
      *
-     * @param int|string $id
+     * @param string $id
      * @param callable|object $service
      */
-    public function register(int|string $id, callable|object $service): static
+    public function register(string $id, callable|object $service): static
     {
         $this->services[$id] = $service;
         return $this;
@@ -42,7 +42,7 @@ class Container implements ContainerInterface
      * @throws ContainerException Если сервис не найден.
      * @return object
      */
-    public function get(int|string $id): object
+    public function get(string $id): object
     {
         if (!isset($this->services[$id])) {
             throw new ContainerException("Service not found: " . $id, 1);
@@ -50,5 +50,9 @@ class Container implements ContainerInterface
 
         $entry = $this->services[$id];
         return $entry instanceof \Closure ? $entry() : $entry;
+    }
+
+    private function resolve(): object
+    {
     }
 }

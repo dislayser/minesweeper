@@ -1,41 +1,47 @@
-// import { WSGAME } from "./ws_game";
+import Cell from "./Entity/Cell.js";
+import { Field } from "./field.js";
 
-class Game{
+export class Game{
     constructor({
         seed = 1234,
         field = $("#gameField"),
     } = {}) {
         this.seed = seed;
         this.field = field;
+        this.cells = [];
         
         this.type = {
-            GET_SERVERS : "get_servers",
-            SET_SERVER : "set_server",
-            OPEN_CELL : "open_cell",
-            OPEN_CELLS : "open_cells",
-            SET_FLAG : "set_flag",
-            NEW_SERVER : "new_server"
+            CREATE : "create",
+            OPEN_CELL : "OPENCELL",
+            OPEN_CELLS : "OPENCELLS",
+            SET_FLAG : "SETFLAG",
         };
-        this.flags = [];
-        this.opened = [];  
 
         try {
             this.ws = new WebSocket('ws://localhost:8080');  
             this.ws.onopen = () => {
                 this.ws.send(JSON.stringify({
-                    "token" : $('input[name="_csrf"]').val() ?? null
+                    "token" : $('input[name="_csrf"]').val() ?? "some CSRF token"
                 }));
             };
             this.ws.onmessage = (event) => {
                 console.log(event.data);
-                let json = JSON.parse(event.data);
+                const json = JSON.parse(event.data);
+                console.log(json);
 
-                // Обработка собщений
-                if (json.type && json.type == "create"){
+                if (json.type && json.type == this.type.CREATE){
                     this.createField(json);
                 }
-                if (json.type && json.type == "cell"){
-                    this.openCell(json.x, json.y, json.isBomb, json.number);
+                if (json.type && json.type == this.type.OPEN_CELL){
+                    for (let i = 0; i < json.data.length; i++) {
+                        console.log(json.data[i]);
+                        this.openCell(
+                            json.data[i].col,
+                            json.data[i].row,
+                            json.data[i].isBomb,
+                            json.data[i].number
+                        );
+                    }
                 }
             };
             this.ws.onerror = (error) => {
@@ -45,15 +51,17 @@ class Game{
                 console.log('Disconnected from the server');
             };
             
-        } catch (error) {
-            
+        } catch (err) {
+            console.warn(err);
         }
     }
 
     createField(data) {
         const field = [];
+        this.cells = [];
         if (data.rows > 0 && data.cols > 0) {
             for (let row = 0; row < data.rows; row++) {
+                this.cells[row] = [];
                 const $row = $("<div>").addClass("d-flex justify-content-center").attr("data-row", row);
                 for (let col = 0; col < data.cols; col++) {
                     const $col = $("<img>").addClass("cell-32")
@@ -61,6 +69,11 @@ class Game{
                         "draggable" : "false",
                         "data-col" : col,
                         "src" : new Field().getCell("cell")
+                    });
+                    this.cells[row][col] = new Cell({
+                        col : col,
+                        row : row,
+                        ui : $col,
                     });
                     $row.append($col);
                 }
@@ -78,13 +91,13 @@ class Game{
         seed = 1234,
         difficult = "easy"
     } = {}) {
-        this.ws.send(JSON.stringify({
-            "type" : "create",
+        this.doAction({
+            "type" : this.type.CREATE,
             "cols" : cols,
             "rows" : rows,
             "seed" : seed,
             "difficult" : difficult
-        }));
+        });
     }
 
     events() {
@@ -92,7 +105,6 @@ class Game{
 
             this.field.on("click", 'img[data-col]', event => {
                 const target = $(event.target);
-                // console.log(target);
                 let col = target.data("col");
                 let row = target.closest("[data-row]").data("row");
 
@@ -102,7 +114,6 @@ class Game{
             this.field.on("contextmenu", 'img[data-col]', event => {
                 event.preventDefault();
                 const target = $(event.target);
-                // console.log(target);
                 let col = target.data("col");
                 let row = target.closest("[data-row]").data("row");
 
@@ -118,16 +129,14 @@ class Game{
         row = Math.abs(parseInt(row));
 
         const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
-        if (cell.data("open") == 1)      return;
-        if (cell.data("flag") === true) return;
-        console.log(cell, cell.data("flag"));
+        if (this.cells[row][col].isOpen()) return;
+        if (this.cells[row][col].isFlag()) return;
         
-        // this.openCell(col, row)
-        this.ws.send(JSON.stringify({
-            "type" : "open",
-            "x" : col, 
-            "y" : row, 
-        }));
+        this.doAction({
+            "type" : this.type.OPEN_CELL,
+            "col" : col, 
+            "row" : row, 
+        });
         return;
     }
 
@@ -141,10 +150,12 @@ class Game{
     }
 
     openCell(col, row, isBomb, number){
-        const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
+        const cell = this.cells[row][col].ui;
         if (!cell.length > 0) return;
-        if (cell.data("open") == 1) return;
-        if (this.flags[row] && this.flags[row][col] === "on") return;
+
+        if (this.cells[row][col].isOpen()) return;
+        if (this.cells[row][col].isFlag()) return;
+
         if (isBomb) {
             cell.attr({
                 src : new Field().getCell("bomb")
@@ -153,42 +164,33 @@ class Game{
             cell.attr({
                 src : new Field().getCell("cell" + number)
             });
-
-            // TODO: Сделать открытие ячеек массивом
-            if (number === 0) {
-                this.field.find(`[data-row="${row+1}"] img[data-col="${col-1}"]`).click();
-                this.field.find(`[data-row="${row+1}"] img[data-col="${col}"]`).click();
-                this.field.find(`[data-row="${row+1}"] img[data-col="${col+1}"]`).click();
-                this.field.find(`[data-row="${row}"] img[data-col="${col-1}"]`).click();
-                // this.field.find(`[data-row="${row}"] img[data-col="${col}"]`).click();
-                this.field.find(`[data-row="${row}"] img[data-col="${col+1}"]`).click();
-                this.field.find(`[data-row="${row-1}"] img[data-col="${col-1}"]`).click();
-                this.field.find(`[data-row="${row-1}"] img[data-col="${col}"]`).click();
-                this.field.find(`[data-row="${row-1}"] img[data-col="${col+1}"]`).click();
-            }
         }
         cell.attr("data-open", "1");
+
+        this.cells[row][col].open(number);
     }
 
     toggleFlag(col, row){
         const cell = this.field.find(`[data-row="${row}"] img[data-col="${col}"]`);
         if (!cell.length > 0) return;
-        if (!this.flags[row]) this.flags[row] = [];
-        if (cell.data("open") == 1) return;
 
-        if (this.flags[row][col] === "on"){
-            this.flags[row][col] = "off";
+        if (this.cells[row][col].isOpen()) return;
+        if (this.cells[row][col].isFlag()){
+            this.cells[row][col].removeFlag();
             cell.attr({
                 "src": new Field().getCell("cell")
             });
             cell.removeAttr("data-flag");
         } else {
-            this.flags[row][col] = "on";
+            this.cells[row][col].setFlag();
             cell.attr({
                 "data-flag" : "true",
                 "src": new Field().getCell("flag")
             });
         }
-        console.log(this.flags);
+    }
+
+    doAction(data) {
+        if (this.ws) this.ws.send(JSON.stringify(data));
     }
 }
