@@ -10,6 +10,10 @@ class Action implements Interfaces\ActionInterface
     public const TYPE_OPENCELLS = "OPENCELLS";
     public const TYPE_SETFLAG = "SETFLAG";
     public const TYPE_CHECKLIVE = "CHECKLIVE";
+    public const TYPE_CREATESERVER = "CREATESERVER";
+    public const TYPE_JOINSERVER = "JOINSERVER";
+    public const TYPE_JOINGAME = "JOINGAME";
+    
 
     public function __construct(
         private string $type,

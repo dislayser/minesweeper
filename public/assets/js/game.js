@@ -13,8 +13,11 @@ export class Game{
         
         this.type = {
             CREATE      : "create",
+            ERROR       : "error",
             CREATEGAME  : "create_game",
             CREATESERVER: "create_server",
+            JOINSERVER  : "JOINSERVER",
+            JOINGAME    : "JOINGAME",
             OPEN_CELL   : "OPENCELL",
             OPEN_CELLS  : "OPENCELLS",
             SET_FLAG    : "SETFLAG",

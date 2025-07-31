@@ -69,6 +69,16 @@ class Server implements Interfaces\ServerInterface
         return null;
     }
 
+    public function getGameById(int|string $serverId): ?Interfaces\GameInterface
+    {
+        foreach ($this->getGames() as $game) {
+            if ($game->getId() === $serverId) {
+                return $game;
+            }
+        }
+        return null;
+    }
+
     public function setModerator(Interfaces\PlayerInterface $player): static
     {
         $this->moderator = $player;
@@ -114,6 +124,14 @@ class Server implements Interfaces\ServerInterface
                     $action->getCellsData(),
                     $player
                 );
+        }
+
+        if ($action->getType() === Action::TYPE_JOINSERVER) {
+            
+        }
+
+        if ($action->getType() === Action::TYPE_JOINGAME) {
+
         }
         
         return null;

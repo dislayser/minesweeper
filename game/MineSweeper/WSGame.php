@@ -16,25 +16,37 @@ class WSGame
     private static array $clients = [];
 
     /**
-     * @var array<Interfaces\ServerInterface>
+     * @var array<ServerInterface>
      */
     private static array $servers = [];
 
 
     // @SERVERS:
+
     public static function addServer(ServerInterface $server): void
     {
         self::$servers[] = $server;
     }
 
-    public static function getServer(int $index): ServerInterface
+    public static function getServer(int $index): ?ServerInterface
     {
-        $server = self::$servers[$index];
+        $server = self::$servers[$index] ?? null;
         return $server;
+    }
+
+    public static function getServerById(int|string $serverId): ?ServerInterface
+    {
+        foreach (self::$servers as $server) {
+            if ($server->getId() === $serverId) {
+                return $server;
+            }
+        }
+        return null;
     }
 
 
     // @CLIENTS:
+
     public static function getClient(int|string $clientId): ?TcpConnection
     {
         return self::$clients[$clientId] ?? null;
@@ -92,9 +104,12 @@ class WSGame
 
     public static function onMessage(TcpConnection $client, string $message): void
     {
+        /**
+         * @var array{type: string}
+         */
         $data = JsonUtil::parse($message);
         
-        $messageType = $data["type"] ?? "null";
+        $type = $data["type"] ?? "null";
 
     }
 }
