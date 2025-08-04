@@ -1,5 +1,6 @@
 export class WSPlugin{
     static ws = null;
+    static callbacks = {};
 
     static {
         if (!this.ws) this.ws = new WebSocket((location.protocol == "https:" ? "wss" : "ws") + '://' + location.hostname  + ":8080");
@@ -7,6 +8,7 @@ export class WSPlugin{
 
     static on(event, fn){
         const events = ["onmessage", "onopen", "onerror", "onclose"];
+        
         if (!this.ws) return;
         if (!events.includes(event)) return;
         if (!typeof fn === "function") return;
@@ -22,6 +24,7 @@ export class WSPlugin{
     }
 
     static send(data = []){
+        console.log(data);
         if (this.ws) this.ws.send(JSON.stringify(data));
     }
 }

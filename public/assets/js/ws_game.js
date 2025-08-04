@@ -28,14 +28,5 @@ export const WSGAME = {
         this.ws().onopen = function() {
             this.ws().send(JSON.stringify(data));
         };
-    },
-    version: function(callback, error) {
-        this.call({name: 'version'}, callback, error);
-    },
-    apidoc: function(callback, error) {
-        this.call({name: 'apidoc'}, callback, error);
-    },
-    apikey: function(domainAndKey, callback, error) {
-        this.call({name: 'apikey', arguments: domainAndKey}, callback, error);
     }
 };

@@ -16,6 +16,8 @@ export class Game{
             ERROR       : "error",
             CREATEGAME  : "create_game",
             CREATESERVER: "create_server",
+            JOINPLAYER  : "new_player",
+            GETSERVERS  : "GETSERVERS",
             JOINSERVER  : "JOINSERVER",
             JOINGAME    : "JOINGAME",
             OPEN_CELL   : "OPENCELL",
@@ -25,13 +27,16 @@ export class Game{
 
         try {
             WSPlugin.on("onopen", () => {
-                WSPlugin.send({"token" : $('input[name="_csrf"]').val() ?? "some CSRF token"});
+                
             });
             WSPlugin.on("onmessage", (json) => {
-                if (json.type && json.type == this.type.CREATE){
+                console.log(json);
+                if (!json.type) return;
+
+                if (json.type == this.type.CREATE){
                     this.createField(json);
                 }
-                if (json.type && json.type == this.type.OPEN_CELL){
+                if (json.type == this.type.OPEN_CELL){
                     for (let i = 0; i < json.data.length; i++) {
                         this.openCell(
                             json.data[i].col,
@@ -40,6 +45,15 @@ export class Game{
                             json.data[i].number
                         );
                     }
+                }
+                if (json.type == this.type.GETSERVERS){
+                    WSPlugin.callbacks.updateServers(json.data);
+                    if (json.data.length == 0) {
+                        this.doAction({"type" : this.type.CREATESERVER});
+                    }
+                }
+                if (json.type == this.type.JOINPLAYER){
+                    WSPlugin.callbacks.updateClients(json.data);
                 }
             });
             WSPlugin.on("onclose", () => {

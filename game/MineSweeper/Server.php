@@ -8,7 +8,8 @@ use Game\Exception\GameException;
 
 class Server implements Interfaces\ServerInterface
 {
-    use Traits\IdTrait;
+    use Traits\IdTrait,
+        Traits\NameTrait;
 
     public const MIN_GAMES = 1;
     public const MAX_GAMES = 4;

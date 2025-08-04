@@ -7,6 +7,8 @@ namespace Game\MineSweeper\Interfaces;
 interface ServerInterface
 {
     public function getId(): int|string;
+    
+    public function getName(): string;
  
     /**
      * @return GameInterface[]

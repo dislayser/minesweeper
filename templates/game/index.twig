@@ -12,34 +12,4 @@
 
 {% block js_render %}
 <script type="module" src="/assets/js/index.js"></script>
-<script type="module">
-    import { Game } from "/assets/js/game.js";
-
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
-
-    var game = new Game({
-        field: $("#gameField")
-    });
-    game.events();
-
-    $("#startGame").click(() => {
-        game.start({
-            cols : $('[name="cols"]').val(),
-            rows : $('[name="rows"]').val(),
-            seed : $('[name="seed"]').val() ?? getRandomInt(1000000),
-            difficult : $('[name="difficult"]').val()
-        });
-    });
-
-    $("#randomSeed").click(() => {
-        $('[name="seed"]').val(getRandomInt(1000000));
-    });
-
-    let test = setInterval(() => {
-        $("#startGame").click()
-        clearInterval(test);
-    }, 500);
-</script>
 {% endblock  %}
