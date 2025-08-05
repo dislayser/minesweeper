@@ -23,11 +23,12 @@ export class Game{
             OPEN_CELL   : "OPENCELL",
             OPEN_CELLS  : "OPENCELLS",
             SET_FLAG    : "SETFLAG",
+            INFO        : "info",
         };
 
         try {
             WSPlugin.on("onopen", () => {
-                
+                this.doAction({"type" : this.type.GETSERVERS});
             });
             WSPlugin.on("onmessage", (json) => {
                 console.log(json);
@@ -54,6 +55,9 @@ export class Game{
                 }
                 if (json.type == this.type.JOINPLAYER){
                     WSPlugin.callbacks.updateClients(json.data);
+                }
+                if (json.type == this.type.INFO){
+                    WSPlugin.callbacks.onInfo(json);
                 }
             });
             WSPlugin.on("onclose", () => {

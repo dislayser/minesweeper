@@ -26,6 +26,8 @@ interface ServerInterface
 
     public function addGame(GameInterface $game): static;
     
+    public function getModerator(): PlayerInterface;
+    
     public function setModerator(PlayerInterface $player): static;
 
     public function doAction(ActionInterface $action): mixed;

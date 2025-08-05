@@ -2,8 +2,10 @@
 
 {% block content %}
     <main class="container my-3">
+        <div class="d-flex  my-3">
+            {% include("parts/sidebar.html.twig") %}
+        </div>
         {% include("parts/config.twig") %}
-        {% include("parts/sidebar.html.twig") %}
     </main>
     <div class="mx-auto">
         <div class="d-flex flex-column user-select-none" id="gameField"></div>

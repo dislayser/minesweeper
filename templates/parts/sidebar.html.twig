@@ -8,14 +8,36 @@
         <h5 class="offcanvas-title" id="serverListLabel">Список серверов</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
-        <div class="d-flex flex-column gap-3 mb-3" id="list"></div>
+    <div class="offcanvas-body">        
+        <table class="table table-sm table-striped table-hover my-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Sever</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="list">
+            </tbody>
+        </table>
 
         <button type="button" class="btn btn-outline-success w-100" id="newServer">
             <i class="bi-plus"></i> Создать сервер
         </button>
+
+        <hr>
+
+        <h5 class="offcanvas-title my-3">Список игроков</h5>
         
-        <div class="d-flex flex-column gap-3 my-3" id="clients"></div>
+        <table class="table table-sm table-striped table-hover my-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody id="clients"></tbody>
+        </table>
     </div>
 </div>
 {% endblock %}

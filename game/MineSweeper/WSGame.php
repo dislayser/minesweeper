@@ -16,11 +16,13 @@ class WSGame
      * @var array<TcpConnection>
      */
     private static array $clients = [];
+    private static array $players = [];
 
     /**
      * @var array<ServerInterface>
      */
     private static array $servers = [];
+    private static int $serverCount = 0;
 
     private static Worker $ws;
 
@@ -38,7 +40,8 @@ class WSGame
         "CREATE"        => "create",
         "ERROR"         => "error",
         "CREATEGAME"    => "create_game",
-        "CREATESERVER"  => "create_server",
+        "CREATESERVER"  => "CREATESERVER",
+        "DELSERVER"     => "DELSERVER",
         "GETSERVERS"    => "GETSERVERS",
         "JOINSERVER"    => "JOINSERVER",
         "JOINGAME"      => "JOINGAME",
@@ -53,6 +56,18 @@ class WSGame
     public static function addServer(ServerInterface $server): void
     {
         self::$servers[] = $server;
+
+        self::updateServers();
+    }
+
+    public static function removeServer(int $id): void
+    {
+        foreach (self::$servers as $key => $server) {
+            if ($server->getId() == $id) {
+                unset(self::$servers[$key]);
+                self::updateServers();
+            }
+        }
     }
 
     public static function getServer(int $index): ?ServerInterface
@@ -97,6 +112,7 @@ class WSGame
     public static function addClient(TcpConnection $client): void
     {
         self::$clients[$client->id] = $client;
+        self::$players[$client->id] = new Player($client->id, new Live());
 
         self::sendMessage($client, [
             "type" => "info",
@@ -119,6 +135,26 @@ class WSGame
 
     // @WS
 
+    public static function updateServers(): void
+    {
+        $list = [];
+        $info = "";
+        foreach (self::$servers as $item) {
+            $list[] = [
+                "name" => $item->getName(),
+                "id" => $item->getId(),
+                "user_id" => $item->getModerator()->getId(),
+            ];
+            $info .= "{$item->getName()} | ";
+        }
+        dump($info);
+        self::sendAll([
+            "type" => "GETSERVERS",
+            "data" => $list,
+        ]);
+    }
+
+
     public static function updateClients(): void
     {
         $list = [];
@@ -126,6 +162,7 @@ class WSGame
         foreach (self::$clients as $item) {
             $list[] = [
                 "name" => "Игрок {$item->id}",
+                "id" => $item->id,
             ];
             $info .= "Игрок {$item->id} | ";
         }
@@ -172,25 +209,22 @@ class WSGame
         
         $type = $data["type"] ?? "null";
 
+        dump("=== TYPE === " . $type);
         if ($type === self::$types["CREATESERVER"]) {
+            self::$serverCount++;
             $server = new Server();
-            $server->setId(count(self::$servers));
-            $server->setName("Server {$server->getId()}");
+            $server->setId(self::$serverCount);
+            $server->setName("Сервер {$server->getId()}");
+            $server->setModerator(self::$players[$client->id] ?? new Player($client->id, new Live()));
             self::addServer($server);
-            // self::sendMessage(self::$clients, []); // Отправка всем о данные о сервере
         }
 
         if ($type === self::$types["GETSERVERS"]) {
-            $servers = [];
-            foreach (self::$servers as $server) {
-                $servers[] = [
-                    "name" => $server->getName()
-                ];
-            }
-            self::sendMessage($client, [
-                "type" => $type,
-                "data" => $servers
-            ]);
+            self::updateServers();
+        }
+
+        if ($type === self::$types["DELSERVER"]) {
+            self::removeServer((int) $data["id"]);
         }
 
     }

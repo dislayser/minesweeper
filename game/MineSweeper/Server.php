@@ -80,6 +80,11 @@ class Server implements Interfaces\ServerInterface
         return null;
     }
 
+    public function getModerator(): Interfaces\PlayerInterface
+    {
+        return $this->moderator;
+    }
+
     public function setModerator(Interfaces\PlayerInterface $player): static
     {
         $this->moderator = $player;
