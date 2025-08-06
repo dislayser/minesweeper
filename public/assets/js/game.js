@@ -14,12 +14,16 @@ export class Game{
         this.type = {
             CREATE      : "create",
             ERROR       : "error",
-            CREATEGAME  : "create_game",
-            CREATESERVER: "create_server",
             JOINPLAYER  : "new_player",
+
+            CREATEGAME  : "CREATEGAME",
+            GETGAMES    : "GETGAMES",
+            JOINGAME    : "JOINGAME",
+
+            CREATESERVER: "CREATESERVER",
             GETSERVERS  : "GETSERVERS",
             JOINSERVER  : "JOINSERVER",
-            JOINGAME    : "JOINGAME",
+            
             OPEN_CELL   : "OPENCELL",
             OPEN_CELLS  : "OPENCELLS",
             SET_FLAG    : "SETFLAG",
@@ -58,6 +62,12 @@ export class Game{
                 }
                 if (json.type == this.type.INFO){
                     WSPlugin.callbacks.onInfo(json);
+                }
+                if (json.type == this.type.JOINSERVER){
+                    WSPlugin.callbacks.onJoinServer(json);
+                }
+                if (json.type == this.type.GETGAMES){
+                    WSPlugin.callbacks.updateGames(json.data);
                 }
             });
             WSPlugin.on("onclose", () => {

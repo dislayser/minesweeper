@@ -9,11 +9,13 @@ use Game\Exception\PlayerDieException;
 
 class Game implements Interfaces\GameInterface
 {
-    use Traits\IdTrait;
+    use Traits\IdTrait,
+        Traits\NameTrait
+    ;
 
     public const TYPE_MP = "MP";
     public const TYPE_SP = "SP";
-    public const MIN_PLAYERS = 1;
+    public const MIN_PLAYERS = 0;
     public const MAX_PLAYERS = 4;
     
     /**
@@ -29,6 +31,11 @@ class Game implements Interfaces\GameInterface
     public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getField(): Interfaces\FieldInterface
+    {
+        return $this->field;
     }
 
     public function setFlag(int $col, int $row, Interfaces\PlayerInterface $player): bool

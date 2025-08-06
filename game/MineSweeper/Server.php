@@ -11,7 +11,7 @@ class Server implements Interfaces\ServerInterface
     use Traits\IdTrait,
         Traits\NameTrait;
 
-    public const MIN_GAMES = 1;
+    public const MIN_GAMES = 0;
     public const MAX_GAMES = 4;
     private array $games = [];
     private Interfaces\PlayerInterface $moderator;

@@ -9,7 +9,8 @@ use Game\Exception\PlayerDieException;
 
 class Player implements Interfaces\PlayerInterface
 {
-    use Traits\IdTrait;
+    use Traits\IdTrait,
+        Traits\NameTrait;
 
     private bool $win = false;
 

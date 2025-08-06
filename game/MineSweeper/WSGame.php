@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Game\MineSweeper;
 
 use DateTime;
+use Game\MineSweeper\Interfaces\GameInterface;
+use Game\MineSweeper\Interfaces\PlayerInterface;
 use Game\MineSweeper\Interfaces\ServerInterface;
 use Game\Service\Util\JsonUtil;
 use Workerman\Connection\TcpConnection;
@@ -16,6 +18,10 @@ class WSGame
      * @var array<TcpConnection>
      */
     private static array $clients = [];
+
+    /**
+     * @var array<PlayerInterface>
+     */
     private static array $players = [];
 
     /**
@@ -23,28 +29,28 @@ class WSGame
      */
     private static array $servers = [];
     private static int $serverCount = 0;
+    private static int $gameCount = 0;
 
-    private static Worker $ws;
-
-    public static function init(): void
-    {
-        self::$ws = new Worker('websocket://0.0.0.0:8080');
-    }
-
-    public static function ws(): Worker
-    {
-        return self::$ws;
-    }
+    public static $difficults = [
+        "easy" => 10,
+        "medium" => 7,
+        "hard" => 4,
+    ];
 
     private static array $types = [
         "CREATE"        => "create",
         "ERROR"         => "error",
-        "CREATEGAME"    => "create_game",
+        
+        "CREATEGAME"    => "CREATEGAME",
+        "GETGAMES"      => "GETGAMES",
+        "DELGAME"       => "DELGAME",
+        "JOINGAME"      => "JOINGAME",
+
+        "GETSERVERS"    => "GETSERVERS",
         "CREATESERVER"  => "CREATESERVER",
         "DELSERVER"     => "DELSERVER",
-        "GETSERVERS"    => "GETSERVERS",
         "JOINSERVER"    => "JOINSERVER",
-        "JOINGAME"      => "JOINGAME",
+
         "OPEN_CELL"     => "OPENCELL",
         "OPEN_CELLS"    => "OPENCELLS",
         "SET_FLAG"      => "SETFLAG",
@@ -79,11 +85,15 @@ class WSGame
     public static function getServerById(int|string $serverId): ?ServerInterface
     {
         foreach (self::$servers as $server) {
-            if ($server->getId() === $serverId) {
+            if ($server->getId() == $serverId) {
                 return $server;
             }
         }
         return null;
+    }
+
+    public static function addGame(int|string $serverId, GameInterface $game) {
+        self::getServerById($serverId)?->addGame($game);
     }
 
 
@@ -109,10 +119,24 @@ class WSGame
         return $clients;
     }
 
+    public static function getPlayerById(string|int $clientId): ?PlayerInterface
+    {
+        foreach (self::$players as $player) {
+            if ($player->getId() == $clientId) {
+                return $player;
+            }
+        }
+        return null;
+    }
+
     public static function addClient(TcpConnection $client): void
     {
         self::$clients[$client->id] = $client;
+
         self::$players[$client->id] = new Player($client->id, new Live());
+        self::$players[$client->id]->setName("Игрок {$client->id}");
+        
+        dump("=== CONNECT === client_id: {$client->id}");
 
         self::sendMessage($client, [
             "type" => "info",
@@ -143,7 +167,7 @@ class WSGame
             $list[] = [
                 "name" => $item->getName(),
                 "id" => $item->getId(),
-                "user_id" => $item->getModerator()->getId(),
+                "user_id" => $item->getModerator()->getName(),
             ];
             $info .= "{$item->getName()} | ";
         }
@@ -179,7 +203,7 @@ class WSGame
         if (is_array($message)) {
             $message = JsonUtil::stringify($message);
         }
-        foreach (self::ws()->connections as $client) {
+        foreach (self::$clients as $client) {
             $client->send($message);
         } ;
     }
@@ -210,6 +234,7 @@ class WSGame
         $type = $data["type"] ?? "null";
 
         dump("=== TYPE === " . $type);
+        
         if ($type === self::$types["CREATESERVER"]) {
             self::$serverCount++;
             $server = new Server();
@@ -224,7 +249,59 @@ class WSGame
         }
 
         if ($type === self::$types["DELSERVER"]) {
-            self::removeServer((int) $data["id"]);
+            self::removeServer((int) $data["serverId"]);
+        }
+
+        if ($type === self::$types["JOINSERVER"]) {
+            $player = self::getPlayerById($client->id);
+            if (isset($data["serverId"]) && $player !== null) {
+                $server = self::getServerById($data["serverId"]);
+
+                self::sendMessage($client, [
+                    "type" => $type,
+                    "id" => $server->getId()
+                ]);
+            }
+        }
+
+        if ($type === self::$types["GETGAMES"]) {
+            if (isset($data["serverId"])) {
+                $server = self::getServerById($data["serverId"]);
+                if ($server === null) {
+                    self::updateServers();
+                } else {
+                    $games = $server->getGames();
+                    $list = [];
+                    foreach ($games as $game) {
+                        $list[] = [
+                            "id" => $game->getId(),
+                            "server" => $server->getName(),
+                            "name" => $game->getName(),
+                        ];
+                    }
+                    self::sendMessage($client, [
+                        "type" => $type,
+                        "data" => $list
+                    ]);
+                }
+            }
+        }
+        if ($type === self::$types["CREATEGAME"]) {
+            $server = self::getServerById($data["serverId"]);
+            if ($server === null) {
+                self::updateServers();
+            } else {
+                $game = new Game(Game::TYPE_MP, new Field(
+                    $cols = (int) $data["cols"],
+                    $rows = (int) $data["rows"],
+                    $bomb = (int) ($rows * $rows / self::$types[$data["difficult"]]),
+                    $seed = (int) $data["seed"],
+                ));
+                self::$gameCount++;
+                $game->setId(self::$gameCount);
+                $game->setName("Игра " . self::$gameCount);
+                self::addGame($server->getId(), $game);
+            }
         }
 
     }

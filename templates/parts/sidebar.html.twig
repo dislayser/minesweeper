@@ -1,20 +1,21 @@
 {% block leftMenu %}
-<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#serverList" aria-controls="serverList">
-    Серверы
-</button>
+<button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#serverList" aria-controls="serverList">Menu</button>
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="serverList" aria-labelledby="serverListLabel">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="serverListLabel">Список серверов</h5>
+        <h5 class="offcanvas-title" id="serverListLabel">Menu</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">        
+    <div class="offcanvas-body">
+        <h5 class="offcanvas-title my-3">Список серверов</h5>
         <table class="table table-sm table-striped table-hover my-3">
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Moder</th>
                     <th>Sever</th>
                     <th>Actions</th>
+                    <th style="width: 33px"></th>
                 </tr>
             </thead>
             <tbody id="list">
@@ -24,6 +25,23 @@
         <button type="button" class="btn btn-outline-success w-100" id="newServer">
             <i class="bi-plus"></i> Создать сервер
         </button>
+
+        <hr>
+
+        <h5 class="offcanvas-title my-3">Список игр сервера</h5>
+        <table class="table table-sm table-striped table-hover my-3">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Server</th>
+                    <th>Game</th>
+                    <th>Actions</th>
+                    <th style="width: 33px"></th>
+                </tr>
+            </thead>
+            <tbody id="games">
+            </tbody>
+        </table>
 
         <hr>
 

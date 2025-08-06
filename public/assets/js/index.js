@@ -27,20 +27,40 @@ $(document).ready(function() {
                     difficult: form.find("#difficult").val(),
                 };
             },
-            list: $("#gameList #list"),
+            list: $("#serverList #games"),
             create: $("#newGame"),
         },
         client: {
             list: $("#serverList #clients")
         }
     };
-    // Для id 
+
+    // Для ID
     var myId = null;
     var serverId = null;
     var gameId = null;
-    function updateId() {
+    const activeClass = "table-warning";
+    function updateMyId() {
         if (!myId) return;
-        ui.client.list.find('tr[data-id="' + myId + '"]').addClass("table-primary");
+        ui.client.list.find('tr[data-id]').removeClass(activeClass);
+        ui.client.list.find('tr[data-id="' + myId + '"]').addClass(activeClass);
+    }
+    function updateMyServerId() {
+        if (!myId) return;
+        if (!serverId) return;
+        ui.server.list.find('tr[data-id]').removeClass(activeClass);
+        ui.server.list.find('tr[data-id="' + serverId + '"]').addClass(activeClass);
+        WSPlugin.send({
+            "type" : "GETGAMES",
+            "serverId" : serverId,
+        })
+    }
+    function updateMyGameId() {
+        if (!myId) return;
+        if (!serverId) return;
+        if (!gameId) return;
+        ui.game.list.find('tr[data-id]').removeClass(activeClass);
+        ui.game.list.find('tr[data-id="' + serverId + '"]').addClass(activeClass);
     }
     
     WSPlugin.callbacks.updateServers = (servers) => {
@@ -51,10 +71,34 @@ $(document).ready(function() {
                 $("<tr>").attr("data-id", server.id)
                 .append([
                     $("<td>").text(server.id),
+                    $("<td>").text(server.user_id),
                     $("<td>").text(server.name),
                     $("<td>").append([
-                        $("<a>").attr("href", "#").text("Войти"),
-                        $("<a>").attr("href", "#").addClass("text-danger ms-3").text("X").attr("data-remove", server.id)
+                        $("<a>").attr("href", "#").text("Войти").attr("data-join", server.id),
+                    ]),
+                    $("<td>").append([
+                        $("<a>").attr("href", "#").addClass("text-danger").attr("data-remove", server.id).append($("<i>").addClass("bi-x"))
+                    ])
+                ])
+            );
+        }
+    }
+    
+    WSPlugin.callbacks.updateGames = (games) => {
+        ui.game.list.empty();
+        for (let i = 0; i < games.length; i++) {
+            const game = games[i];
+            ui.game.list.append(
+                $("<tr>").attr("data-id", game.id)
+                .append([
+                    $("<td>").text(game.id),
+                    $("<td>").text(game.server),
+                    $("<td>").text(game.name),
+                    $("<td>").append([
+                        $("<a>").attr("href", "#").text("Играть").attr("data-join", game.id),
+                    ]),
+                    $("<td>").append([
+                        $("<a>").attr("href", "#").addClass("text-danger").attr("data-remove", game.id).append($("<i>").addClass("bi-x"))
                     ])
                 ])
             );
@@ -71,20 +115,35 @@ $(document).ready(function() {
                 ])
             );
         }
-        updateId();
+        updateMyId();
     };
+    WSPlugin.callbacks.onJoinServer = (data) => {
+        console.log(data);
+        serverId = data.id;
+        updateMyServerId();
+    }
+
     WSPlugin.callbacks.onInfo = (info) => {
         myId = info.id;
-        updateId();
+        updateMyId();
     };
+    ui.server.list.on("click", "[data-join]", (event) => {
+        const clicked = $(event.currentTarget);
+        const id = clicked.attr("data-join");
+        if (!id) return;
+        WSPlugin.send({
+            "type" : "JOINSERVER",
+            "serverId" : id
+        })
+    });
     ui.server.list.on("click", "[data-remove]", (event) => {
         const clicked = $(event.currentTarget);
-        const serverId = clicked.attr("data-remove");
-        if (!serverId) return;
+        const id = clicked.attr("data-remove");
+        if (!id) return;
 
         WSPlugin.send({
             "type" : "DELSERVER",
-            "id" : serverId
+            "serverId" : id
         })
     });
     ui.server.create.on("click", () => {
