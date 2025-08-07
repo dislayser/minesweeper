@@ -1,5 +1,6 @@
 import Cell from "./Entity/Cell.js";
 import { Field } from "./field.js";
+import { WSPlugin } from "./WS/plugin.js";
 
 export class Game{
     constructor({
@@ -11,30 +12,37 @@ export class Game{
         this.cells = [];
         
         this.type = {
-            CREATE : "create",
-            OPEN_CELL : "OPENCELL",
-            OPEN_CELLS : "OPENCELLS",
-            SET_FLAG : "SETFLAG",
+            CREATE      : "create",
+            ERROR       : "error",
+            JOINPLAYER  : "new_player",
+
+            CREATEGAME  : "CREATEGAME",
+            GETGAMES    : "GETGAMES",
+            JOINGAME    : "JOINGAME",
+
+            CREATESERVER: "CREATESERVER",
+            GETSERVERS  : "GETSERVERS",
+            JOINSERVER  : "JOINSERVER",
+            
+            OPEN_CELL   : "OPENCELL",
+            OPEN_CELLS  : "OPENCELLS",
+            SET_FLAG    : "SETFLAG",
+            INFO        : "info",
         };
 
         try {
-            this.ws = new WebSocket('ws://localhost:8080');  
-            this.ws.onopen = () => {
-                this.ws.send(JSON.stringify({
-                    "token" : $('input[name="_csrf"]').val() ?? "some CSRF token"
-                }));
-            };
-            this.ws.onmessage = (event) => {
-                console.log(event.data);
-                const json = JSON.parse(event.data);
+            WSPlugin.on("onopen", () => {
+                this.doAction({"type" : this.type.GETSERVERS});
+            });
+            WSPlugin.on("onmessage", (json) => {
                 console.log(json);
+                if (!json.type) return;
 
-                if (json.type && json.type == this.type.CREATE){
+                if (json.type == this.type.CREATE){
                     this.createField(json);
                 }
-                if (json.type && json.type == this.type.OPEN_CELL){
+                if (json.type == this.type.OPEN_CELL){
                     for (let i = 0; i < json.data.length; i++) {
-                        console.log(json.data[i]);
                         this.openCell(
                             json.data[i].col,
                             json.data[i].row,
@@ -43,14 +51,29 @@ export class Game{
                         );
                     }
                 }
-            };
-            this.ws.onerror = (error) => {
-                console.error('WebSocket error:', error);
-            };
-            this.ws.onclose = () => {
+                if (json.type == this.type.GETSERVERS){
+                    WSPlugin.callbacks.updateServers(json.data);
+                    if (json.data.length == 0) {
+                        this.doAction({"type" : this.type.CREATESERVER});
+                    }
+                }
+                if (json.type == this.type.JOINPLAYER){
+                    WSPlugin.callbacks.updateClients(json.data);
+                }
+                if (json.type == this.type.INFO){
+                    WSPlugin.callbacks.onInfo(json);
+                }
+                if (json.type == this.type.JOINSERVER){
+                    WSPlugin.callbacks.onJoinServer(json);
+                }
+                if (json.type == this.type.GETGAMES){
+                    WSPlugin.callbacks.updateGames(json.data);
+                }
+            });
+            WSPlugin.on("onclose", () => {
                 console.log('Disconnected from the server');
-            };
-            
+            });
+            WSPlugin.on("onerror", console.error);
         } catch (err) {
             console.warn(err);
         }
@@ -191,6 +214,6 @@ export class Game{
     }
 
     doAction(data) {
-        if (this.ws) this.ws.send(JSON.stringify(data));
+        WSPlugin.send(data);
     }
 }

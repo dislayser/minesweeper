@@ -7,10 +7,13 @@ namespace Game\MineSweeper\Interfaces;
 interface GameInterface
 {
     public function getId(): int|string;
+    public function getName(): string;
     /**
      * @return "MP"|"SP"
      */
     public function getType(): string;
+
+    public function getField(): FieldInterface;
 
     /**
      * @return PlayerInterface[]

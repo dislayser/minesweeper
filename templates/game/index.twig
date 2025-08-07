@@ -1,41 +1,17 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
-    {% include("game/config.twig") %}
+    <main class="container my-3">
+        <div class="d-flex  my-3">
+            {% include("parts/sidebar.html.twig") %}
+        </div>
+        {% include("parts/config.twig") %}
+    </main>
     <div class="mx-auto">
         <div class="d-flex flex-column user-select-none" id="gameField"></div>
     </div>
 {% endblock %}
 
 {% block js_render %}
-<script type="module">
-    import { Game } from "/assets/js/game.js";
-
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
-
-    var game = new Game({
-        field: $("#gameField")
-    });
-    game.events();
-
-    $("#startGame").click(() => {
-        game.start({
-            cols : $('[name="cols"]').val(),
-            rows : $('[name="rows"]').val(),
-            seed : $('[name="seed"]').val() ?? getRandomInt(1000000),
-            difficult : $('[name="difficult"]').val()
-        });
-    });
-
-    $("#randomSeed").click(() => {
-        $('[name="seed"]').val(getRandomInt(1000000));
-    });
-
-    let test = setInterval(() => {
-        $("#startGame").click()
-        clearInterval(test);
-    }, 500);
-</script>
+<script type="module" src="/assets/js/index.js"></script>
 {% endblock  %}

@@ -7,6 +7,8 @@ namespace Game\MineSweeper\Interfaces;
 interface ServerInterface
 {
     public function getId(): int|string;
+    
+    public function getName(): string;
  
     /**
      * @return GameInterface[]
@@ -23,6 +25,8 @@ interface ServerInterface
     public function getGameByPlayer(PlayerInterface $player): ?GameInterface;
 
     public function addGame(GameInterface $game): static;
+    
+    public function getModerator(): PlayerInterface;
     
     public function setModerator(PlayerInterface $player): static;
 
