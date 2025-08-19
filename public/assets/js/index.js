@@ -35,6 +35,20 @@ $(document).ready(function() {
         }
     };
 
+    const playerNameInput = $("<input>").addClass("form-control form-control-sm").attr({
+        type: "text",
+        placeholder: "Имя игрока",
+        maxlength: 16,
+        minlength: 3,
+    });
+    $("body").append(playerNameInput);
+    playerNameInput.on("input", () => {
+        WSPlugin.send({
+            "type" : "SETPLAYERNAME",
+            "name" : playerNameInput.val(),
+        })
+    });
+
     // Для ID
     var myId = null;
     var serverId = null;
@@ -43,7 +57,10 @@ $(document).ready(function() {
     function updateMyId() {
         if (!myId) return;
         ui.client.list.find('tr[data-id]').removeClass(activeClass);
-        ui.client.list.find('tr[data-id="' + myId + '"]').addClass(activeClass);
+        const myRow = ui.client.list.find(`tr[data-id="${myId}"]`);
+        myRow.addClass(activeClass);
+        // myRow.find("[data-input-name]").text("").append(playerNameInput);
+
     }
     function updateMyServerId() {
         if (!myId) return;
@@ -82,6 +99,7 @@ $(document).ready(function() {
                 ])
             );
         }
+        updateMyServerId();
     }
     
     WSPlugin.callbacks.updateGames = (games) => {
@@ -111,7 +129,7 @@ $(document).ready(function() {
             ui.client.list.append($("<tr>").attr("data-id", client.id)
                 .append([
                     $("<td>").text(client.id),
-                    $("<td>").text(client.name)
+                    $("<td>").text(client.name).attr("data-input-name", 1)
                 ])
             );
         }
@@ -125,6 +143,7 @@ $(document).ready(function() {
 
     WSPlugin.callbacks.onInfo = (info) => {
         myId = info.id;
+        playerNameInput.val(info.name)
         updateMyId();
     };
     ui.server.list.on("click", "[data-join]", (event) => {

@@ -40,6 +40,8 @@ class WSGame
     private static array $types = [
         "CREATE"        => "create",
         "ERROR"         => "error",
+
+        "SETPLAYERNAME" => "SETPLAYERNAME",
         
         "CREATEGAME"    => "CREATEGAME",
         "GETGAMES"      => "GETGAMES",
@@ -129,6 +131,13 @@ class WSGame
         return null;
     }
 
+    public static function setPlayerName(string|int $clientId, string $name): void
+    {
+        $player = self::getPlayerById($clientId);
+        $player->setName($name);
+        self::updateClients();
+    }
+
     public static function addClient(TcpConnection $client): void
     {
         self::$clients[$client->id] = $client;
@@ -142,6 +151,7 @@ class WSGame
             "type" => "info",
             "msg" => "Connection success",
             "id" => $client->id, // Отправляем уникальный ID клиенту
+            "name" => self::$players[$client->id]->getName(),
         ]);
 
         self::updateClients();
@@ -185,10 +195,10 @@ class WSGame
         $info = "";
         foreach (self::$clients as $item) {
             $list[] = [
-                "name" => "Игрок {$item->id}",
+                "name" => self::getPlayerById($item->id)->getName(),
                 "id" => $item->id,
             ];
-            $info .= "Игрок {$item->id} | ";
+            $info .= self::getPlayerById($item->id)->getName() . " | ";
         }
         dump("Обновление " . (new DateTime())->format("d.m.Y H:i:s"));
         dump($info);
@@ -302,6 +312,9 @@ class WSGame
                 $game->setName("Игра " . self::$gameCount);
                 self::addGame($server->getId(), $game);
             }
+        }
+        if ($type === self::$types["SETPLAYERNAME"]) {
+            self::setPlayerName($client->id, (string) $data["name"]);
         }
 
     }
