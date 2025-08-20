@@ -24,7 +24,7 @@ export class WSPlugin{
     }
 
     static send(data = []){
-        console.log(data);
+        console.log("SEND", data);
         if (this.ws) this.ws.send(JSON.stringify(data));
     }
 }

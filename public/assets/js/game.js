@@ -65,6 +65,7 @@ export class Game{
                 }
                 if (json.type == this.type.JOINSERVER){
                     WSPlugin.callbacks.onJoinServer(json);
+                    this.doAction({"type" : this.type.GETGAMES});
                 }
                 if (json.type == this.type.GETGAMES){
                     WSPlugin.callbacks.updateGames(json.data);

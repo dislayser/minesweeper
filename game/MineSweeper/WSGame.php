@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Game\MineSweeper;
 
-use DateTime;
 use Game\MineSweeper\Interfaces\GameInterface;
 use Game\MineSweeper\Interfaces\PlayerInterface;
 use Game\MineSweeper\Interfaces\ServerInterface;
 use Game\Service\Util\JsonUtil;
 use Workerman\Connection\TcpConnection;
-use Workerman\Worker;
 
 class WSGame
 {
@@ -68,7 +66,8 @@ class WSGame
         self::updateServers();
     }
 
-    public static function removeServer(int $id): void
+    // ToDo: Возможно стоить разрешить только для модера удалять сервер 
+    public static function removeServer(int $id, string|int $clientId): void
     {
         foreach (self::$servers as $key => $server) {
             if ($server->getId() == $id) {
@@ -96,6 +95,26 @@ class WSGame
 
     public static function addGame(int|string $serverId, GameInterface $game) {
         self::getServerById($serverId)?->addGame($game);
+    }
+
+    public static function updateGames(string|int $serverId): void
+    {
+        $server = self::getServerById($serverId);
+        if ($server !== null) {
+            $games = $server->getGames();
+            $list = [];
+            foreach ($games as $game) {
+                $list[] = [
+                    "server" => $server->getName(),
+                    "id" => $game->getId(),
+                    "name" => $game->getName(),
+                ];
+            }
+            self::sendAll([
+                "type" => "GETGAMES",
+                "data" => $list,
+            ]);
+        }
     }
 
 
@@ -159,7 +178,7 @@ class WSGame
 
     public static function removeClient(TcpConnection $client): void
     {
-        dump("Выкл: " . $client->id);
+        dump("Выкл: {$client->id}");
         self::updateClients();
         if (isset(self::$clients[$client->id])) {
             unset(self::$clients[$client->id]);
@@ -200,7 +219,7 @@ class WSGame
             ];
             $info .= self::getPlayerById($item->id)->getName() . " | ";
         }
-        dump("Обновление " . (new DateTime())->format("d.m.Y H:i:s"));
+        dump("Обновление " . (new \DateTime())->format("d.m.Y H:i:s"));
         dump($info);
         self::sendAll([
             "type" => "new_player",
@@ -259,7 +278,7 @@ class WSGame
         }
 
         if ($type === self::$types["DELSERVER"]) {
-            self::removeServer((int) $data["serverId"]);
+            self::removeServer((int) $data["serverId"], $client->id);
         }
 
         if ($type === self::$types["JOINSERVER"]) {
@@ -304,13 +323,14 @@ class WSGame
                 $game = new Game(Game::TYPE_MP, new Field(
                     $cols = (int) $data["cols"],
                     $rows = (int) $data["rows"],
-                    $bomb = (int) ($rows * $rows / self::$types[$data["difficult"]]),
+                    $bomb = (int) ($rows * $rows / self::$difficults[$data["difficult"]]),
                     $seed = (int) $data["seed"],
                 ));
                 self::$gameCount++;
                 $game->setId(self::$gameCount);
                 $game->setName("Игра " . self::$gameCount);
                 self::addGame($server->getId(), $game);
+                self::updateGames($server->getId());
             }
         }
         if ($type === self::$types["SETPLAYERNAME"]) {

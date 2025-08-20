@@ -1,6 +1,11 @@
 import { Game } from "./game.js";
 import { WSPlugin } from "./WS/plugin.js";
 
+// Для ID
+var myId = null;
+var serverId = null;
+var gameId = null;
+
 $(document).ready(function() {
     var game = new Game({
         field: $("#gameField")
@@ -18,6 +23,7 @@ $(document).ready(function() {
             configs: () => {
                 const form = $("form#gameConfigs");
                 return {
+                    serverId : serverId,
                     cols: parseInt(form.find("#cols").val()),
                     rows: parseInt(form.find("#rows").val()),
                     seed: parseInt(
@@ -35,31 +41,20 @@ $(document).ready(function() {
         }
     };
 
-    const playerNameInput = $("<input>").addClass("form-control form-control-sm").attr({
-        type: "text",
-        placeholder: "Имя игрока",
-        maxlength: 16,
-        minlength: 3,
-    });
-    $("body").append(playerNameInput);
+    const playerNameInput = $('[placeholder="Имя игрока"]');
     playerNameInput.on("input", () => {
         WSPlugin.send({
             "type" : "SETPLAYERNAME",
             "name" : playerNameInput.val(),
-        })
+        });
     });
-
-    // Для ID
-    var myId = null;
-    var serverId = null;
-    var gameId = null;
+    
     const activeClass = "table-warning";
     function updateMyId() {
         if (!myId) return;
         ui.client.list.find('tr[data-id]').removeClass(activeClass);
         const myRow = ui.client.list.find(`tr[data-id="${myId}"]`);
         myRow.addClass(activeClass);
-        // myRow.find("[data-input-name]").text("").append(playerNameInput);
 
     }
     function updateMyServerId() {
@@ -67,10 +62,11 @@ $(document).ready(function() {
         if (!serverId) return;
         ui.server.list.find('tr[data-id]').removeClass(activeClass);
         ui.server.list.find('tr[data-id="' + serverId + '"]').addClass(activeClass);
-        WSPlugin.send({
-            "type" : "GETGAMES",
-            "serverId" : serverId,
-        })
+        if (serverId) {
+            ui.game.create.attr("disabled", false);
+        } else {
+            ui.game.create.attr("disabled", true);
+        }
     }
     function updateMyGameId() {
         if (!myId) return;
@@ -163,11 +159,15 @@ $(document).ready(function() {
         WSPlugin.send({
             "type" : "DELSERVER",
             "serverId" : id
-        })
+        });
     });
     ui.server.create.on("click", () => {
+        WSPlugin.send({"type" : "CREATESERVER"});
+    })
+    ui.game.create.on("click", () => {
         WSPlugin.send({
-            "type" : "CREATESERVER"
-        })
+            "type" : "CREATEGAME",
+            ...ui.game.configs()
+        });
     })
 });
